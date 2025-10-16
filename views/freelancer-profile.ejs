@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillNest - Freelancer Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <!-- Header -->
+  <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+        <img src="/Skillnest Logo Black and White.png" alt="SkillNest" height="40" class="me-2">
+        <span class="fs-4">SkillNest</span>
+      </a>
+      <div class="d-flex align-items-center">
+        <a class="btn btn-outline-secondary me-2" href="/jobs">Browse Jobs</a>
+        <% if (user) { %>
+          <a class="btn btn-outline-primary" href="/dashboard">Dashboard</a>
+        <% } %>
+      </div>
+    </div>
+  </header>
+
+  <div class="container mt-4">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        <div class="card card-soft mb-4">
+          <div class="card-body text-center">
+            <img src="https://via.placeholder.com/150" alt="Profile Photo" class="rounded-circle mb-3" style="width: 150px; height: 150px;">
+            <h4>John Doe</h4>
+            <p class="text-muted">Full-Stack Web Developer</p>
+            <p class="mb-2">"Passionate about creating innovative web solutions that drive business growth."</p>
+            <div class="mb-3">
+              <i class="fas fa-shield-alt text-success me-1"></i>
+              <span class="badge bg-success">Verified</span>
+            </div>
+            <div class="rating mb-3">
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star-half-alt text-warning"></i>
+              <span class="ms-1">4.7 (128 reviews)</span>
+            </div>
+            <button class="btn btn-primary w-100">Contact Freelancer</button>
+          </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="card card-soft">
+          <div class="card-body">
+            <h5>Quick Stats</h5>
+            <ul class="list-unstyled">
+              <li><i class="fas fa-briefcase text-primary me-2"></i> 45 Projects Completed</li>
+              <li><i class="fas fa-clock text-info me-2"></i> 3 Years Experience</li>
+              <li><i class="fas fa-map-marker-alt text-secondary me-2"></i> Kuala Lumpur, Malaysia</li>
+              <li><i class="fas fa-language text-success me-2"></i> English, Malay</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-lg-8">
+        <!-- Skills Section -->
+        <div class="card card-soft mb-4">
+          <div class="card-body">
+            <h5 class="mb-3">Skills & Expertise</h5>
+            <div class="skill-meter mb-3">
+              <div class="d-flex justify-content-between">
+                <span>JavaScript</span>
+                <span>95%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-primary" style="width: 95%"></div>
+              </div>
+            </div>
+            <div class="skill-meter mb-3">
+              <div class="d-flex justify-content-between">
+                <span>React</span>
+                <span>90%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-success" style="width: 90%"></div>
+              </div>
+            </div>
+            <div class="skill-meter mb-3">
+              <div class="d-flex justify-content-between">
+                <span>Node.js</span>
+                <span>85%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-info" style="width: 85%"></div>
+              </div>
+            </div>
+            <div class="skill-meter mb-3">
+              <div class="d-flex justify-content-between">
+                <span>Python</span>
+                <span>80%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-warning" style="width: 80%"></div>
+              </div>
+            </div>
+            <div class="skill-meter">
+              <div class="d-flex justify-content-between">
+                <span>UI/UX Design</span>
+                <span>75%</span>
+              </div>
+              <div class="progress">
+                <div class="progress-bar bg-secondary" style="width: 75%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Portfolio Gallery -->
+        <div class="card card-soft mb-4">
+          <div class="card-body">
+            <h5 class="mb-3">Portfolio</h5>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <img src="https://via.placeholder.com/300x200" alt="Project 1" class="img-fluid rounded">
+              </div>
+              <div class="col-md-4 mb-3">
+                <img src="https://via.placeholder.com/300x200" alt="Project 2" class="img-fluid rounded">
+              </div>
+              <div class="col-md-4 mb-3">
+                <img src="https://via.placeholder.com/300x200" alt="Project 3" class="img-fluid rounded">
+              </div>
+              <div class="col-md-4 mb-3">
+                <img src="https://via.placeholder.com/300x200" alt="Project 4" class="img-fluid rounded">
+              </div>
+              <div class="col-md-4 mb-3">
+                <img src="https://via.placeholder.com/300x200" alt="Project 5" class="img-fluid rounded">
+              </div>
+              <div class="col-md-4 mb-3">
+                <img src="https://via.placeholder.com/300x200" alt="Project 6" class="img-fluid rounded">
+              </div>
+            </div>
+            <button class="btn btn-outline-primary">View Full Portfolio</button>
+          </div>
+        </div>
+
+        <!-- Availability Calendar -->
+        <div class="card card-soft mb-4">
+          <div class="card-body">
+            <h5 class="mb-3">Availability</h5>
+            <div class="calendar">
+              <div class="d-flex justify-content-between mb-2">
+                <button class="btn btn-sm btn-outline-secondary"><</button>
+                <h6>November 2023</h6>
+                <button class="btn btn-sm btn-outline-secondary">></button>
+              </div>
+              <div class="row text-center">
+                <div class="col">Mon</div>
+                <div class="col">Tue</div>
+                <div class="col">Wed</div>
+                <div class="col">Thu</div>
+                <div class="col">Fri</div>
+                <div class="col">Sat</div>
+                <div class="col">Sun</div>
+              </div>
+              <div class="row text-center mt-2">
+                <div class="col"><span class="badge bg-success">1</span></div>
+                <div class="col"><span class="badge bg-success">2</span></div>
+                <div class="col"><span class="badge bg-success">3</span></div>
+                <div class="col"><span class="badge bg-warning">4</span></div>
+                <div class="col"><span class="badge bg-danger">5</span></div>
+                <div class="col"><span class="badge bg-secondary">6</span></div>
+                <div class="col"><span class="badge bg-secondary">7</span></div>
+              </div>
+              <p class="mt-2 small">
+                <span class="badge bg-success">Available</span>
+                <span class="badge bg-warning ms-2">Limited</span>
+                <span class="badge bg-danger ms-2">Busy</span>
+                <span class="badge bg-secondary ms-2">Unavailable</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ratings & Reviews -->
+        <div class="card card-soft">
+          <div class="card-body">
+            <h5 class="mb-3">Client Reviews</h5>
+            <div class="review mb-3">
+              <div class="d-flex align-items-center mb-2">
+                <img src="https://via.placeholder.com/40" alt="Client" class="rounded-circle me-2" style="width: 40px; height: 40px;">
+                <div>
+                  <h6 class="mb-0">Sarah Johnson</h6>
+                  <div class="rating">
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                  </div>
+                </div>
+              </div>
+              <p>"Excellent work! Delivered on time and exceeded expectations. Highly recommend."</p>
+              <small class="text-muted">2 weeks ago</small>
+            </div>
+            <div class="review mb-3">
+              <div class="d-flex align-items-center mb-2">
+                <img src="https://via.placeholder.com/40" alt="Client" class="rounded-circle me-2" style="width: 40px; height: 40px;">
+                <div>
+                  <h6 class="mb-0">Mike Chen</h6>
+                  <div class="rating">
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star-half-alt text-warning"></i>
+                  </div>
+                </div>
+              </div>
+              <p>"Great communication and professional approach. Will work with again."</p>
+              <small class="text-muted">1 month ago</small>
+            </div>
+            <div class="review">
+              <div class="d-flex align-items-center mb-2">
+                <img src="https://via.placeholder.com/40" alt="Client" class="rounded-circle me-2" style="width: 40px; height: 40px;">
+                <div>
+                  <h6 class="mb-0">Lisa Wong</h6>
+                  <div class="rating">
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                    <i class="fas fa-star text-warning"></i>
+                  </div>
+                </div>
+              </div>
+              <p>"Outstanding quality and attention to detail. Worth every penny."</p>
+              <small class="text-muted">2 months ago</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

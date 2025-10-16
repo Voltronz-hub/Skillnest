@@ -1,0 +1,22 @@
+# Sample Render service configuration for Skillnest.
+# Replace placeholders (repo, branch, env var values) before using.
+services:
+  - type: web
+    name: skillnest-web
+    env: node
+    plan: starter
+    region: oregon
+    repo: https://github.com/<your-org-or-username>/<your-repo>
+    branch: main
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        value: "__REPLACE_WITH_YOUR_MONGODB_URI__"
+      - key: SESSION_SECRET
+        value: "__REPLACE_WITH_A_STRONG_SECRET__"
+      # Add any other env vars your app needs (payment keys, email creds, etc.)
+    disk: 1GB
+    instanceCount: 1
+    instanceType: starter
+    # Note: uploads/ is ephemeral on Render. Use S3 or another object store for file uploads.

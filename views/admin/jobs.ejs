@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Job Management - SkillNest Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body>
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="container">
+    <h1 class="mb-4">Job Management</h1>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Client</th>
+          <th>Status</th>
+          <th>Approval</th>
+          <th>Budget</th>
+          <th>Posted</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% jobs.forEach(job => { %>
+          <tr>
+            <td><%= job.title %></td>
+            <td><%= job.client ? job.client.username : 'N/A' %></td>
+            <td>
+              <select class="form-select form-select-sm status-select" data-job-id="<%= job._id %>">
+                <option value="open" <%= job.status === 'open' ? 'selected' : '' %>>Open</option>
+                <option value="in-progress" <%= job.status === 'in-progress' ? 'selected' : '' %>>In Progress</option>
+                <option value="completed" <%= job.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                <option value="cancelled" <%= job.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+              </select>
+            </td>
+            <td>
+              <span class="badge bg-<%= job.approved ? 'success' : 'warning' %>">
+                <%= job.approved ? 'Approved' : 'Pending' %>
+              </span>
+            </td>
+            <td><%= job.budget ? '$' + job.budget : 'N/A' %></td>
+            <td><%= job.createdAt.toDateString() %></td>
+            <td>
+              <% if (!job.approved) { %>
+                <button class="btn btn-sm btn-success approve-job me-1" data-job-id="<%= job._id %>">
+                  Approve
+                </button>
+                <button class="btn btn-sm btn-warning reject-job me-1" data-job-id="<%= job._id %>">
+                  Reject
+                </button>
+              <% } %>
+              <button class="btn btn-sm btn-danger delete-job" data-job-id="<%= job._id %>">
+                Delete
+              </button>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+      <nav aria-label="Job pagination">
+        <ul class="pagination justify-content-center">
+          <% if (hasPrev) { %>
+            <li class="page-item">
+              <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+            </li>
+          <% } %>
+
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+              <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+            </li>
+          <% } %>
+
+          <% if (hasNext) { %>
+            <li class="page-item">
+              <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+            </li>
+          <% } %>
+        </ul>
+      </nav>
+    <% } %>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Update job status functionality
+    document.querySelectorAll('.status-select').forEach(select => {
+      select.addEventListener('change', async function() {
+        const jobId = this.getAttribute('data-job-id');
+        const status = this.value;
+
+        try {
+          const response = await fetch(`/admin/jobs/${jobId}/status`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status })
+          });
+          const result = await response.json();
+          if (result.success) {
+            // Show success message
+            console.log('Status updated successfully');
+          } else {
+            alert('Error: ' + result.message);
+          }
+        } catch (error) {
+          alert('Error updating job status');
+        }
+      });
+    });
+
+    // Delete job functionality
+    document.querySelectorAll('.delete-job').forEach(button => {
+      button.addEventListener('click', async function() {
+        const jobId = this.getAttribute('data-job-id');
+        if (confirm('Are you sure you want to delete this job?')) {
+          try {
+            const response = await fetch(`/admin/jobs/${jobId}/delete`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            });
+            const result = await response.json();
+            if (result.success) {
+              alert('Job deleted successfully');
+              location.reload();
+            } else {
+              alert('Error: ' + result.message);
+            }
+          } catch (error) {
+            alert('Error deleting job');
+          }
+        }
+      });
+    });
+
+    // Approve/Reject job functionality
+    document.querySelectorAll('.approve-job, .reject-job').forEach(button => {
+      button.addEventListener('click', async function() {
+        const jobId = this.getAttribute('data-job-id');
+        const isApprove = this.classList.contains('approve-job');
+        const action = isApprove ? 'approve' : 'reject';
+        if (confirm(`Are you sure you want to ${action} this job?`)) {
+          try {
+            const response = await fetch(`/admin/jobs/${jobId}/approve`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: `approved=${isApprove}`
+            });
+            const result = await response.json();
+            if (result.success) {
+              alert(`Job ${action}d successfully`);
+              location.reload();
+            } else {
+              alert('Error: ' + result.message);
+            }
+          } catch (error) {
+            alert(`Error ${action}ing job`);
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

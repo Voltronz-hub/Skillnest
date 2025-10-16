@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <%- include('partials/navbar') %>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="mb-4 text-center">Edit Profile</h2>
+            <% if (typeof error !== 'undefined' && error) { %>
+              <div class="alert alert-danger"><%= error %></div>
+            <% } %>
+            <form method="POST" action="/profile/edit" enctype="multipart/form-data">
+              <div class="mb-3 text-center">
+                <% if (profile && profile.profileImage) { %>
+                  <img src="/uploads/<%= profile.profileImage %>" alt="Profile Image" class="rounded-circle mb-2" style="width:100px;height:100px;object-fit:cover;">
+                <% } %>
+              </div>
+              <div class="mb-3">
+                <label for="profileImage" class="form-label">Upload New Profile Image</label>
+                <input type="file" name="profileImage" id="profileImage" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" value="<%= profile ? profile.username : '' %>">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" value="<%= profile ? profile.email : '' %>">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Full name</label>
+                <input type="text" name="name" class="form-control" value="<%= profile ? profile.name || '' : '' %>">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Bio</label>
+                <textarea name="bio" class="form-control" rows="3"><%= profile ? profile.bio || '' : '' %></textarea>
+              </div>
+              <% if (profile && profile.role === 'freelancer') { %>
+                <div class="mb-3">
+                  <label class="form-label">Skills (comma separated)</label>
+                  <input type="text" name="skills" class="form-control" value="<%= profile && profile.skills ? profile.skills.join(', ') : '' %>">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Hourly Rate</label>
+                  <input type="number" step="0.01" name="hourlyRate" class="form-control" value="<%= profile ? profile.hourlyRate || '' : '' %>">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Location</label>
+                  <input type="text" name="location" class="form-control" value="<%= profile ? profile.location || '' : '' %>">
+                </div>
+              <% } else { %>
+                <div class="mb-3">
+                  <label class="form-label">Company</label>
+                  <input type="text" name="company" class="form-control" value="<%= profile ? profile.company || '' : '' %>">
+                </div>
+              <% } %>
+              <hr />
+              <h5 class="mb-3">Verification</h5>
+              <div class="mb-3">
+                <% if (typeof verificationStatus !== 'undefined' && verificationStatus) { %>
+                  <p>Current status: <strong><%= verificationStatus %></strong></p>
+                <% } else { %>
+                  <p>Current status: <strong>none</strong></p>
+                <% } %>
+              </div>
+              <div class="mb-3">
+                <label for="verificationDoc" class="form-label">Upload Verification Document (ID, Certs)</label>
+                <input type="file" name="verificationDoc" id="verificationDoc" class="form-control" multiple>
+              </div>
+              <% if (typeof verificationDocs !== 'undefined' && verificationDocs && verificationDocs.length) { %>
+                <div class="mb-3">
+                  <label class="form-label">Uploaded Documents</label>
+                  <ul class="list-group">
+                    <% verificationDocs.forEach(function(doc) { %>
+                      <li class="list-group-item"><a href="/uploads/<%= doc %>" target="_blank"><%= doc %></a></li>
+                    <% }) %>
+                  </ul>
+                </div>
+              <% } %>
+              <hr />
+              <div class="mb-3">
+                <label for="portfolio" class="form-label">Portfolio uploads (images/PDF)</label>
+                <input type="file" name="portfolio" id="portfolio" class="form-control" multiple>
+              </div>
+              <% if (profile && profile.portfolio && profile.portfolio.length) { %>
+                <div class="mb-3">
+                  <label class="form-label">Portfolio</label>
+                  <div class="d-flex flex-wrap gap-2">
+                    <% profile.portfolio.forEach(function(p) { %>
+                      <a href="/uploads/<%= p %>" target="_blank"><img src="/uploads/<%= p %>" style="width:80px;height:80px;object-fit:cover;border-radius:.4rem"/></a>
+                    <% }) %>
+                  </div>
+                </div>
+              <% } %>
+              <button type="submit" class="btn btn-success w-100">Save Changes</button>
+            </form>
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+      <%- include('partials/footer') %>
+    </body>
+    </html>

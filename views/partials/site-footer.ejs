@@ -1,0 +1,284 @@
+<footer class="site-footer mt-5 bg-light py-5" aria-label="Site Footer">
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-12 col-md-3">
+        <a href="/" class="d-flex align-items-center mb-3 text-decoration-none">
+          <img src="/Skillnest logo.png" alt="Skillnest" style="height:34px; margin-right:.5rem;"/>
+          <span class="h6 mb-0">Skillnest</span>
+        </a>
+        <p class="text-muted small">Find talent or work — securely and quickly. Trusted by a growing community of freelancers and clients.</p>
+        <!-- download buttons removed as requested -->
+      </div>
+
+      <div class="col-6 col-md-2">
+        <h6 class="fw-semibold">Product</h6>
+        <ul class="list-unstyled small">
+          <li><a href="#" class="text-muted">Latest launches</a></li>
+          <li><a href="#" class="text-muted">Magic Studio</a></li>
+          <li><a href="#" class="text-muted">Brand management</a></li>
+          <li><a href="#" class="text-muted">Features</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-2">
+        <h6 class="fw-semibold">Plans</h6>
+        <ul class="list-unstyled small">
+          <li><a href="#" class="text-muted">Pricing</a></li>
+          <li><a href="#" class="text-muted">Pro</a></li>
+          <li><a href="#" class="text-muted">Teams</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-2">
+        <h6 class="fw-semibold">Help</h6>
+        <ul class="list-unstyled small">
+          <li><a href="#" class="text-muted">Help Centre</a></li>
+          <li><a href="#" class="text-muted">Security</a></li>
+          <li><a href="#" class="text-muted">Accessibility</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <h6 class="fw-semibold">Community</h6>
+        <ul class="list-unstyled small">
+          <li><a href="#" class="text-muted">Creators</a></li>
+          <li><a href="#" class="text-muted">Affiliates</a></li>
+          <li><a href="#" class="text-muted">Business partners</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <div class="row align-items-center">
+      <div class="col-12 col-md-6 d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center small text-muted">
+          <span class="me-2">🌐 English (US)</span>
+          <a href="#" class="text-muted me-2"><i class="bi bi-linkedin"></i></a>
+          <a href="#" class="text-muted me-2"><i class="bi bi-twitter"></i></a>
+          <a href="#" class="text-muted me-2"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="text-muted"><i class="bi bi-youtube"></i></a>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 text-md-end small text-muted">
+        <a href="#" class="text-muted me-3">Privacy</a>
+        <a href="#" class="text-muted me-3">Terms</a>
+        <span>© <%= new Date().getFullYear() %> Skillnest. All rights reserved.</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Footer scripts: include bootstrap bundle and small accessibility helper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Improve avatar dropdown keyboard access: focus first menu item when opened
+  document.addEventListener('shown.bs.dropdown', function (e) {
+    try {
+      const menu = e.target.querySelector('.dropdown-menu');
+      if (menu) {
+        const first = menu.querySelector('.dropdown-item');
+        if (first) first.focus();
+      }
+    } catch (err) { /* ignore */ }
+  });
+</script>
+
+  <!-- Compact chat popup (site-wide) -->
+  <div id="compactChatPill" class="compact-chat-pill" role="button" aria-label="Chat">
+    <div class="pill-inner d-flex align-items-center">
+      <span class="pill-icon">💬</span>
+      <span class="pill-text ms-2">Chat</span>
+      <span class="pill-dot ms-2 d-none" id="pillDot"></span>
+    </div>
+  </div>
+
+  <script>
+    // Bind on DOMContentLoaded to ensure element exists
+    document.addEventListener('DOMContentLoaded', function(){
+      const pill = document.getElementById('compactChatPill');
+      if (!pill) return;
+      pill.addEventListener('click', function(){
+        const ev = new CustomEvent('compactChatClicked');
+        window.dispatchEvent(ev);
+        // fallback navigation after small delay (will be suppressed if popup handled)
+        setTimeout(() => { if (!window.__handledCompactChat) window.location.href = '/chat'; }, 250);
+      });
+    });
+  </script>
+
+  <script>
+    // Notifications: initialize badge and listen for socket events (using ChatClient)
+    document.addEventListener('DOMContentLoaded', function(){
+      const notifBtn = document.getElementById('notificationsBtn');
+      const badge = document.getElementById('notifBadge');
+      async function loadUnread(){
+        try {
+          const res = await fetch('/notifications/unread-count');
+          if (!res.ok) return;
+          const j = await res.json();
+          if (j.unread && j.unread > 0) {
+            badge.textContent = j.unread; badge.classList.remove('d-none');
+          } else {
+            badge.classList.add('d-none');
+          }
+        } catch (err) { /* ignore */ }
+      }
+      loadUnread();
+
+      // toggle a simple notifications list (fetch recent on click)
+      notifBtn && notifBtn.addEventListener('click', async function(){
+        try {
+          const res = await fetch('/notifications');
+          if (!res.ok) throw new Error('Failed');
+          const list = await res.json();
+          // simple dropdown: show native alert for now, could be modal
+          const html = list.slice(0,6).map(n => `${new Date(n.createdAt).toLocaleString()}: ${n.message}`).join('\n\n');
+          alert(html || 'No notifications');
+          // mark all as read for now (quick approach)
+          const ids = list.map(i => i._id);
+          if (ids.length) await fetch('/notifications/mark-read', { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ ids }) });
+          badge.classList.add('d-none');
+        } catch (err) { console.error(err); alert('Failed to load notifications'); }
+      });
+
+      // use ChatClient for notification events
+      try {
+        const ensure = function(){
+          if (window.ChatClient) return window.ChatClient;
+          // if ChatClient not yet loaded, wait briefly
+          return null;
+        };
+        if (window.ChatClient) {
+          window.ChatClient.on('notification', function(p){ if (!p || !p.user) return; const cur = parseInt(badge.textContent || '0',10)||0; badge.textContent = cur + 1; badge.classList.remove('d-none'); });
+        } else {
+          // load chat client lazily
+          const s = document.createElement('script'); s.src = '/js/chat.js'; s.onload = function(){ if (window.ChatClient) window.ChatClient.on('notification', function(p){ if (!p || !p.user) return; const cur = parseInt(badge.textContent || '0',10)||0; badge.textContent = cur + 1; badge.classList.remove('d-none'); }); };
+          document.body.appendChild(s);
+        }
+      } catch (err) { /* ignore socket errors */ }
+    });
+  </script>
+
+  <!-- Socket.IO client and compact chat panel logic -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/chat.js"></script>
+  <div id="compactChatPanel" class="compact-chat-panel d-none" aria-hidden="true">
+    <div class="d-flex" style="min-height:320px;">
+      <div class="compact-chat-list border-end" id="compactChatList" style="width:120px;padding:8px;overflow:auto;background:#fbfbfc;"></div>
+      <div style="flex:1;display:flex;flex-direction:column;">
+        <div class="compact-chat-header d-flex align-items-center justify-content-between p-2">
+          <div class="fw-semibold" id="compactPanelTitle">Chat</div>
+          <div>
+            <button id="compactClose" class="btn btn-sm btn-light">✕</button>
+          </div>
+        </div>
+        <div id="compactChatBody" class="compact-chat-body p-2" style="flex:1;overflow:auto;"></div>
+        <div class="compact-chat-input p-2 d-flex gap-2">
+          <input id="compactMsg" class="form-control form-control-sm" placeholder="Type a message...">
+          <button id="compactSend" class="btn btn-sm btn-primary">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      (function(){
+        let currentJobId = null;
+        const panel = document.getElementById('compactChatPanel');
+        const body = document.getElementById('compactChatBody');
+        const msgInput = document.getElementById('compactMsg');
+        const sendBtn = document.getElementById('compactSend');
+        const closeBtn = document.getElementById('compactClose');
+        const listEl = document.getElementById('compactChatList');
+        const panelTitle = document.getElementById('compactPanelTitle');
+
+        function bindClientEvents(){
+          if (!window.ChatClient) return;
+          window.ChatClient.on('recentMessages', renderMessages);
+          window.ChatClient.on('chatMessage', appendMessage);
+          window.ChatClient.on('messageRead', function(info){ document.querySelectorAll(`.unread-badge[data-job="${info.jobId}"]`).forEach(b=>b.remove()); });
+          window.ChatClient.on('presenceUpdate', function(p){ const dots = document.querySelectorAll(`.presence-dot[data-user="${p.userId}"]`); dots.forEach(d => { if (p.online) { d.classList.remove('d-none'); d.title='online'; d.style.background='green'; } else { d.classList.add('d-none'); } }); });
+        }
+
+        async function loadConversations(){
+          try {
+            const res = await fetch('/chat/conversations');
+            if (!res.ok) throw new Error('Failed to load');
+            const convos = await res.json();
+            listEl.innerHTML = '';
+            if (!convos.length) { listEl.innerHTML = '<div class="small text-muted">No conversations</div>'; return; }
+            convos.forEach(c => {
+              const item = document.createElement('div');
+              item.className = 'compact-convo p-2 small d-flex align-items-center gap-2';
+              item.style.cursor = 'pointer';
+              const presenceDot = `<span class="presence-dot me-2 d-none" data-user="${c.userId}" title="offline"></span>`;
+              const unreadBadge = c.unread ? `<span class="badge bg-danger ms-2 small unread-badge" data-job="${c.jobId}">${c.unread}</span>` : '';
+              item.innerHTML = `${presenceDot}<div class="flex-grow-1">${c.username}</div><div class="text-muted small">${c.lastMessage ? '•' : ''}${unreadBadge}</div>`;
+              item.addEventListener('click', function(){ openPanelForJob({ id: c.jobId || c.userId, title: c.username }); panelTitle.textContent = c.username; });
+              listEl.appendChild(item);
+            });
+          } catch (err) {
+            listEl.innerHTML = '<div class="small text-muted">Failed to load</div>';
+          }
+        }
+
+        function openPanelForJob(job){
+          if (!job || !job.id) return openPanel();
+          currentJobId = job.id;
+          body.innerHTML = '<div class="text-muted small">Loading messages...</div>';
+          panel.classList.remove('d-none'); panel.setAttribute('aria-hidden','false');
+          window.__handledCompactChat = true;
+          window.ChatClient && window.ChatClient.joinRoom({ jobId: currentJobId, userId: window?.USER_ID || '' });
+        }
+
+        function openPanel(){
+          currentJobId = null;
+          body.innerHTML = '<div class="small text-muted">Select a contact to start a conversation.</div>';
+          panel.classList.remove('d-none'); panel.setAttribute('aria-hidden','false');
+          window.__handledCompactChat = true;
+          loadConversations();
+        }
+
+        function renderMessages(list){ body.innerHTML=''; if (!list || !list.length){ body.innerHTML = '<div class="small text-muted">No messages yet.</div>'; return; } list.forEach(m=>appendMessage(m)); body.scrollTop = body.scrollHeight; }
+
+        function appendMessage(m){ const el = document.createElement('div'); const who = m.sender || 'User'; const time = m.createdAt ? new Date(m.createdAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : ''; el.className = 'compact-msg mb-2'; el.innerHTML = `<div class="small"><strong>${who}</strong> <span class="text-muted small">${time}</span></div><div>${m.message || ''}</div>`; body.appendChild(el); body.scrollTop = body.scrollHeight; }
+
+        bindClientEvents();
+
+        sendBtn.addEventListener('click', function(){ const text = msgInput.value.trim(); if (!text) return; if (!currentJobId) { alert('Open a job conversation first.'); return; } window.ChatClient && window.ChatClient.sendMessage({ jobId: currentJobId, userId: window?.USER_ID || '', message: text }); msgInput.value = ''; });
+
+        closeBtn.addEventListener('click', function(){ panel.classList.add('d-none'); panel.setAttribute('aria-hidden','true'); });
+        window.addEventListener('compactChatClicked', function(){ openPanel(); });
+        window.addEventListener('openJobFromList', function(e){ const payload = e.detail || {}; if (payload.id) openPanelForJob({ id: payload.id, title: payload.title, client: payload.client }); });
+        window.addEventListener('openCompactChatForJob', function(e){ const payload = e.detail || {}; if (payload.id) openPanelForJob({ id: payload.id, title: payload.title, client: payload.client }); });
+        window.openCompactChatForJob = function(job){ window.dispatchEvent(new CustomEvent('openCompactChatForJob', { detail: job })); };
+      })();
+    });
+  </script>
+
+  <!-- User profile modal (site-wide) -->
+  <div class="modal fade" id="userProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userProfileTitle">Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="userProfileBody">
+          <div class="text-center small text-muted">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio lightbox modal -->
+  <div class="modal fade" id="portfolioLightbox" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-transparent border-0">
+        <div class="modal-body p-0 text-center">
+          <img id="lightboxImg" src="" style="max-width:100%;max-height:80vh;border-radius:.5rem;" />
+        </div>
+      </div>
+    </div>
+  </div>

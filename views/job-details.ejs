@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SkillNest - Job Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <%- include('partials/navbar') %>
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <header class="card shadow-sm mb-4 p-4">
+          <div class="d-flex align-items-center">
+            <div class="me-4" style="width:84px;flex:0 0 84px;">
+              <% const avatar = (job.client && job.client.profileImage) ? ('/uploads/' + job.client.profileImage) : '/Skillnest logo.png'; %>
+              <div style="width:72px;height:72px;border-radius:50%;background:#0d6efd33;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                <img src="<%= avatar %>" alt="avatar" style="width:64px;height:64px;object-fit:cover;border-radius:50%" />
+              </div>
+            </div>
+            <div style="flex:1;">
+              <h1 class="h2 mb-1"><%= job.title %></h1>
+              <p class="mb-2 text-muted"><%= job.description %></p>
+              <div class="small text-muted">Client, <span class="fw-semibold"><%= job.client.username %></span></div>
+              <div class="small text-muted">Posted <span class="timeago" data-time="<%= job.createdAt ? job.createdAt : '' %>"></span></div>
+            </div>
+            <div class="ms-3 text-end" style="flex:0 0 auto;">
+              <% if (job.attachment) { %>
+                <a href="/uploads/<%= job.attachment %>" class="btn btn-outline-primary btn-sm me-2">Download</a>
+              <% } %>
+              <% if (typeof user !== 'undefined' && user) { %>
+                <% if (typeof role !== 'undefined' && role === 'client') { %>
+                  <button id="openChatDrawerBtn" class="btn btn-warning btn-lg rounded-pill">Message Freelancers</button>
+                <% } else if (typeof role !== 'undefined' && role === 'freelancer') { %>
+                  <button id="openChatDrawerBtn" class="btn btn-warning btn-lg rounded-pill">Message Client</button>
+                <% } else { %>
+                  <button id="openChatDrawerBtn" class="btn btn-warning btn-lg rounded-pill">Message</button>
+                <% } %>
+              <% } else { %>
+                <a href="/auth/login" class="btn btn-warning btn-lg rounded-pill">Login to message</a>
+              <% } %>
+              <% if (typeof role !== 'undefined' && role === 'client') { %>
+                <div class="mt-2">
+                  <button id="headerHireBtn" class="btn btn-outline-primary btn-sm">Hire top applicant</button>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        </header>
+
+        <section class="card shadow-sm mb-4 p-4">
+          <h4 class="mb-3">Proposals</h4>
+          <% if (job.proposals && job.proposals.length) { %>
+            <div class="list-group mb-3">
+              <% job.proposals.forEach(function(proposal) { %>
+                <div class="list-group-item" data-proposal-id="<%= proposal._id %>">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <div class="fw-bold"><%= proposal.freelancer.username ? proposal.freelancer.username : proposal.freelancer %></div>
+                      <div class="small text-muted"><%= proposal.message %></div>
+                      <div class="small text-muted">Status: <span class="proposal-status"><%= proposal.status || 'pending' %></span></div>
+                    </div>
+                    <div class="text-end">
+                      <% if (typeof role !== 'undefined' && role === 'client') { %>
+                        <% if (!proposal.status || proposal.status === 'pending') { %>
+                          <button class="btn btn-sm btn-primary hire-btn" data-id="<%= proposal._id %>">Hire</button>
+                        <% } else if (proposal.status === 'hired') { %>
+                          <span class="badge bg-warning">Hired</span>
+                        <% } else if (proposal.status === 'accepted') { %>
+                          <span class="badge bg-success">Accepted</span>
+                        <% } else if (proposal.status === 'rejected') { %>
+                          <span class="badge bg-secondary">Rejected</span>
+                        <% } %>
+                      <% } else if (typeof role !== 'undefined' && role === 'freelancer') { %>
+                        <% // if this freelancer owns the proposal and client has hired, show accept/reject %>
+                        <% const isOwner = (proposal.freelancer && proposal.freelancer._id && (proposal.freelancer._id.toString() === (user && user._id ? user._id.toString() : ''))); %>
+                        <% if (isOwner && proposal.status === 'hired') { %>
+                          <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-success respond-accept" data-id="<%= proposal._id %>">Accept</button>
+                            <button class="btn btn-sm btn-outline-danger respond-reject" data-id="<%= proposal._id %>">Reject</button>
+                          </div>
+                        <% } else { %>
+                          <span class="small text-muted"><%= proposal.status || 'Submitted' %></span>
+                        <% } %>
+                      <% } else { %>
+                        <span class="small text-muted"><%= proposal.status || 'Submitted' %></span>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          <% } else { %>
+            <p class="text-muted small">No proposals yet. Be the first to apply and stand out!</p>
+          <% } %>
+
+          <% if (typeof role !== 'undefined' && role === 'freelancer') { %>
+            <form method="POST" action="/proposals/submit" class="mt-3">
+              <input type="hidden" name="jobId" value="<%= job._id %>">
+              <div class="mb-3">
+                <label class="form-label">Your pitch</label>
+                <textarea name="message" class="form-control" rows="3" placeholder="Describe why you're a good fit" required></textarea>
+              </div>
+              <div class="row g-2 align-items-center mb-3">
+                <div class="col-md-6">
+                  <input type="text" name="budget" class="form-control" placeholder="Proposed budget (optional)">
+                </div>
+                <div class="col-md-6 text-end">
+                  <button type="submit" class="btn btn-primary">Submit Proposal</button>
+                </div>
+              </div>
+            </form>
+          <% } %>
+        </section>
+
+        <section class="card shadow-sm mb-4 p-4">
+          <h4 class="mb-3">Milestones</h4>
+          <% if (job.milestones && job.milestones.length) { %>
+            <ul class="list-group">
+              <% job.milestones.forEach(function(milestone) { %>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div><%= milestone.description %></div>
+                  <div>
+                    <% if (milestone.completed) { %>
+                      <span class="badge bg-success">Completed</span>
+                    <% } else { %>
+                      <span class="badge bg-secondary">Pending</span>
+                    <% } %>
+                  </div>
+                </li>
+              <% }); %>
+            </ul>
+          <% } else { %>
+            <p class="small text-muted">No milestones yet. <strong>Accepted</strong> proposals can set due dates here.</p>
+          <% } %>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat drawer -->
+  <div id="chatDrawer" class="chat-drawer">
+    <div class="chat-drawer-header d-flex justify-content-between align-items-center p-3 border-bottom">
+      <div>
+        <strong>Live Chat</strong>
+        <div class="small text-muted">Conversation for this job</div>
+      </div>
+      <div>
+        <button id="closeChatDrawer" class="btn btn-sm btn-light">Close</button>
+      </div>
+    </div>
+    <div class="chat-drawer-body p-3" id="drawerChatContent" style="height:320px;overflow:auto"></div>
+    <div class="chat-drawer-footer p-3 border-top">
+      <form id="drawerUpload" action="/chat/<%= job._id %>/upload" method="POST" enctype="multipart/form-data" class="mb-2 d-flex gap-2">
+        <input type="file" name="attachment" class="form-control form-control-sm" />
+        <input type="text" name="message" class="form-control form-control-sm" placeholder="Optional note" />
+        <button class="btn btn-outline-secondary btn-sm" type="submit">Upload</button>
+      </form>
+      <div class="input-group">
+        <input type="text" id="drawerMsg" class="form-control" placeholder="Type a message">
+        <button class="btn btn-primary" id="drawerSend">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/chat.js"></script>
+  <script>
+    (function(){
+      const jobId = '<%= job._id %>';
+      const userId = "<%= user ? user._id : '' %>";
+      const openBtn = document.getElementById('openChatDrawerBtn');
+      const closeBtn = document.getElementById('closeChatDrawer');
+      const drawer = document.getElementById('chatDrawer');
+      const drawerChat = document.getElementById('drawerChatContent');
+      const sendBtn = document.getElementById('drawerSend');
+      const input = document.getElementById('drawerMsg');
+
+      function appendMessage(m) {
+        const who = m.senderName || m.sender || 'User';
+        const avatarUrl = m.senderAvatar || '/Skillnest logo.png';
+        const isOwn = (m.senderId === userId) || (m.sender && m.sender._id && m.sender._id.toString() === userId);
+        const time = m.createdAt ? timeAgo(m.createdAt) : '';
+        const attachments = m.attachments && m.attachments.length ? m.attachments.map(a => `<div><a href="${a.path}" target="_blank">${a.filename}</a></div>`).join('') : '';
+        const read = m.read ? `<span class='read-indicator text-success' title='Read'>&#10003;</span>` : '';
+        const el = document.createElement('div');
+        el.className = 'mb-2 d-flex ' + (isOwn ? 'justify-content-end' : 'justify-content-start');
+        el.innerHTML = `
+          <div class="chat-bubble${isOwn ? ' own' : ''}">
+            <div class="d-flex align-items-center mb-1">
+              <img src="${avatarUrl}" class="chat-avatar me-2" width="32" height="32" style="object-fit:cover;border-radius:50%">
+              <span class='fw-bold text-primary'>${who}</span>
+              <small class='text-muted ms-2 timeago' data-time="${m.createdAt}">${time}</small>
+              ${read}
+            </div>
+            <div>${m.message || ''}</div>
+            ${attachments}
+          </div>
+        `;
+        drawerChat.appendChild(el);
+        drawerChat.scrollTop = drawerChat.scrollHeight;
+      }
+
+      function timeAgo(date) {
+        const now = new Date();
+        const then = new Date(date);
+        const diff = Math.floor((now - then) / 1000);
+        if (diff < 10) return 'just now';
+        if (diff < 60) return Math.floor(diff) + 's ago';
+        if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+        if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+        if (diff < 604800) return Math.floor(diff/86400) + 'd ago';
+        // fallback to short month/day format for older dates
+        const opts = { month: 'short', day: 'numeric' };
+        return then.toLocaleDateString(undefined, opts);
+      }
+
+      setInterval(() => {
+        document.querySelectorAll('.timeago').forEach(el => {
+          const t = el.getAttribute('data-time');
+          if (t) el.textContent = timeAgo(t);
+        });
+      }, 60000);
+
+      // populate timeago elements immediately on load
+      document.querySelectorAll('.timeago').forEach(el => { const t = el.getAttribute('data-time'); if (t) el.textContent = timeAgo(t); });
+
+      openBtn && openBtn.addEventListener('click', function(){
+        drawer.classList.add('open');
+        window.ChatClient && window.ChatClient.joinRoom({ jobId, userId });
+        window.ChatClient && window.ChatClient.markRead(jobId);
+      });
+      closeBtn && closeBtn.addEventListener('click', function(){ drawer.classList.remove('open'); });
+
+      window.addEventListener('openJobFromList', function(e){
+        try {
+          const payload = e.detail || {};
+          if (payload.id && payload.id === jobId) {
+            drawer.classList.add('open');
+            window.ChatClient && window.ChatClient.joinRoom({ jobId, userId });
+          }
+        } catch(err) { /* ignore */ }
+      });
+
+      // ChatClient event wiring
+      window.ChatClient && window.ChatClient.on('recentMessages', function(list){
+        drawerChat.innerHTML = '';
+        list.forEach(function(m){ appendMessage(m); });
+        window.ChatClient && window.ChatClient.markRead(jobId);
+      });
+
+      window.ChatClient && window.ChatClient.on('chatMessage', function(data){ appendMessage(data); });
+
+      // Typing indicator
+      let typingTimeout;
+      input && input.addEventListener('input', function() { window.ChatClient && window.ChatClient.emitTyping(jobId); });
+      window.ChatClient && window.ChatClient.on('typing', function(data){
+        if (!document.getElementById('typing-indicator')) {
+          const el = document.createElement('div');
+          el.id = 'typing-indicator';
+          el.className = 'text-muted small fst-italic';
+          el.textContent = (data && data.name ? data.name : 'Someone') + ' is typing...';
+          drawerChat.appendChild(el);
+          drawerChat.scrollTop = drawerChat.scrollHeight;
+        }
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+          const el = document.getElementById('typing-indicator');
+          if (el) el.remove();
+        }, 1500);
+      });
+
+      drawerChat && drawerChat.addEventListener('scroll', function(){
+        if (drawerChat.scrollHeight - drawerChat.scrollTop - drawerChat.clientHeight < 100) {
+          window.ChatClient && window.ChatClient.markRead(jobId);
+        }
+      });
+
+      sendBtn && sendBtn.addEventListener('click', function(){
+        const text = input.value.trim(); if (!text) return;
+        window.ChatClient && window.ChatClient.sendMessage({ jobId, userId, message: text });
+        input.value = '';
+      });
+
+      const drawerUpload = document.getElementById('drawerUpload');
+      drawerUpload && drawerUpload.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const res = await fetch(form.action, { method: 'POST', body: formData });
+        if (res.ok) {
+          form.reset();
+        } else {
+          alert('Upload failed. Only images and PDFs allowed.');
+        }
+      });
+
+      input && input.addEventListener('keyup', function(e){ if (e.key === 'Enter') sendBtn.click(); });
+      window.openChatDrawer = function(){
+        try {
+          drawer.classList.add('open');
+          window.ChatClient && window.ChatClient.joinRoom({ jobId, userId });
+          window.__handledCompactChat = true;
+        } catch(err) { /* ignore */ }
+      };
+      // Proposal action handlers (hire/respond)
+      document.addEventListener('click', async function(e){
+        const hire = e.target.closest('.hire-btn');
+        const accept = e.target.closest('.respond-accept');
+        const reject = e.target.closest('.respond-reject');
+        try {
+          if (hire) {
+            const id = hire.getAttribute('data-id');
+            const res = await fetch('/proposals/' + encodeURIComponent(id) + '/hire', { method: 'POST', headers: { 'Content-Type':'application/json' } });
+            if (res.ok) {
+              const parent = hire.closest('[data-proposal-id]');
+              parent.querySelector('.proposal-status').textContent = 'hired';
+              hire.replaceWith(document.createElement('span'));
+              const badge = document.createElement('span'); badge.className = 'badge bg-warning'; badge.textContent = 'Hired'; parent.querySelector('.text-end').appendChild(badge);
+            } else throw new Error('Failed');
+          }
+          if (accept || reject) {
+            const btn = accept || reject;
+            const action = accept ? 'accept' : 'reject';
+            const id = btn.getAttribute('data-id');
+            const res = await fetch('/proposals/' + encodeURIComponent(id) + '/respond', { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ action }) });
+            if (res.ok) {
+              const data = await res.json();
+              const parent = btn.closest('[data-proposal-id]');
+              parent.querySelector('.proposal-status').textContent = data.status;
+              // replace buttons with status badge
+              const container = parent.querySelector('.text-end');
+              container.innerHTML = '';
+              const cls = data.status === 'accepted' ? 'bg-success' : 'bg-secondary';
+              const b = document.createElement('span'); b.className = 'badge ' + cls; b.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+              container.appendChild(b);
+            } else throw new Error('Failed');
+          }
+        } catch (err) { console.error(err); alert('Action failed'); }
+      });
+
+      // Header hire flow (client): hire first pending proposal
+      const headerHire = document.getElementById('headerHireBtn');
+      const hireToastEl = document.getElementById('hireToast');
+      const undoBtn = document.getElementById('undoHire');
+      if (headerHire) {
+        headerHire.addEventListener('click', async function(){
+          try {
+            // find first pending proposal id
+            const p = document.querySelector('[data-proposal-id]');
+            if (!p) return alert('No proposals to hire');
+            const id = p.getAttribute('data-proposal-id');
+            const res = await fetch('/proposals/' + encodeURIComponent(id) + '/hire', { method: 'POST' });
+            if (!res.ok) throw new Error('Hire failed');
+            // show toast with undo
+            const bs = new bootstrap.Toast(hireToastEl);
+            bs.show();
+            // attach undo
+            undoBtn.onclick = async function(){
+              try {
+                const r2 = await fetch('/proposals/' + encodeURIComponent(id) + '/unhire', { method: 'POST' });
+                if (!r2.ok) throw new Error('Unhire failed');
+                bs.hide();
+                // refresh page to reflect state
+                window.location.reload();
+              } catch (err) { alert('Undo failed'); }
+            };
+          } catch (err) { console.error(err); alert('Hire failed'); }
+        });
+      }
+    })();
+  </script>
+  <!-- Toast for hire confirmation/undo -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index:1100">
+    <div id="hireToast" class="toast" role="status" aria-live="polite" aria-atomic="true">
+      <div class="toast-body">
+        Hired. <button id="undoHire" class="btn btn-sm btn-link">Undo</button>
+      </div>
+    </div>
+  </div>
+  <%- include('partials/footer') %>
+</body>
+</html>

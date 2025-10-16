@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pending Verifications</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mt-5">
+    <h2>Pending Verifications</h2>
+    <% if (flash) { %>
+      <div class="alert alert-info"><%= flash %></div>
+    <% } %>
+    <% if (!pending || pending.length === 0) { %>
+      <p>No pending verifications.</p>
+    <% } else { %>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Documents</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% pending.forEach(function(u) { %>
+            <tr>
+              <td><%= u.username %></td>
+              <td>
+                <% if (u.verificationDocs && u.verificationDocs.length) { %>
+                  <div class="d-flex flex-column">
+                    <% u.verificationDocs.forEach(function(d) { %>
+                      <% const ext = d.split('.').pop().toLowerCase(); %>
+                      <% if (['png','jpg','jpeg','gif','webp'].includes(ext)) { %>
+                        <a href="/uploads/<%= d %>" target="_blank"><img src="/uploads/<%= d %>" alt="doc" style="max-width:120px; max-height:80px; object-fit:cover; margin-right:8px;"/></a>
+                      <% } else { %>
+                        <a href="/uploads/<%= d %>" target="_blank" class="d-block"><%= d %></a>
+                      <% } %>
+                    <% }) %>
+                  </div>
+                <% } else { %>
+                  <em>No documents uploaded</em>
+                <% } %>
+              </td>
+              <td>
+                <form id="approve-<%= u._id %>" style="display:inline" method="POST" action="/admin/verifications/<%= u._id %>/approve">
+                  <button class="btn btn-success btn-sm">Approve</button>
+                </form>
+                <form id="reject-<%= u._id %>" style="display:inline" method="POST" action="/admin/verifications/<%= u._id %>/reject">
+                  <input type="hidden" name="reason" value="" />
+                  <button type="button" class="btn btn-danger btn-sm" onclick="rejectUser('<%= u._id %>')">Reject</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+  <script>
+    function rejectUser(id) {
+      var reason = prompt('Enter rejection reason (optional):');
+      var form = document.getElementById('reject-' + id);
+      if (!form) return;
+      if (reason !== null) {
+        form.querySelector('input[name="reason"]').value = reason;
+        form.submit();
+      }
+    }
+  </script>
+</body>
+</html>

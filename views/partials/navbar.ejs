@@ -1,0 +1,38 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/">SkillNest</a>
+    <div>
+    <% if (typeof user !== 'undefined' && user) { %>
+      <span class="me-3">Logged in as <span class="badge bg-success text-light"><%= typeof role !== 'undefined' ? role : '' %></span></span>
+        <a class="btn btn-outline-primary me-2" href="/jobs">Browse Jobs</a>
+        <button id="notificationsBtn" class="btn btn-light me-2 position-relative" aria-label="Notifications" type="button">
+          <i class="bi bi-bell"></i>
+          <span id="notifBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
+        </button>
+        <div class="btn-group">
+          <button id="profileBtnPartial" type="button" class="btn btn-light dropdown-toggle p-0 border-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:44px;height:44px;border-radius:50%;overflow:hidden">
+            <% if (typeof profileImage !== 'undefined' && profileImage) { %>
+              <img src="/uploads/<%= profileImage %>" alt="Profile" style="width:44px;height:44px;object-fit:cover;">
+            <% } else if (typeof user !== 'undefined' && user && user.profileImage) { %>
+              <img src="/uploads/<%= user.profileImage %>" alt="Profile" style="width:44px;height:44px;object-fit:cover;">
+            <% } else { %>
+              <span class="d-inline-block bg-secondary text-white text-center" style="width:44px;height:44px;line-height:44px;border-radius:50%"> <%= (typeof role !== 'undefined' && role ? role.charAt(0).toUpperCase() : 'U') %> </span>
+            <% } %>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileBtnPartial" role="menu">
+            <% if (typeof role !== 'undefined' && role === 'admin') { %>
+              <li><a class="dropdown-item" href="/admin" role="menuitem">Admin Dashboard</a></li>
+              <li><hr class="dropdown-divider"></li>
+            <% } %>
+            <li><a class="dropdown-item" href="/profile/edit" role="menuitem">Edit Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="/auth/logout" role="menuitem">Logout</a></li>
+          </ul>
+        </div>
+      <% } else { %>
+        <a class="btn btn-outline-primary me-2" href="/auth/login">Login</a>
+        <a class="btn btn-success" href="/auth/register">Register</a>
+      <% } %>
+    </div>
+  </div>
+</nav>

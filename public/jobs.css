@@ -1,0 +1,34 @@
+/* Jobs page custom styles */
+.jobs-hero{ background: linear-gradient(180deg,#fff,#fbfdff); }
+.jobs-hero .display-4{ color:#0f1720; font-weight:700; }
+.jobs-hero p.lead{ color: #4b5563; }
+.sticky-filter{ position:sticky; top:90px; }
+.jobs-card{ border-radius:10px; }
+.hover-lift{ transition: transform .18s ease, box-shadow .18s ease; }
+.hover-lift:hover{ transform: translateY(-6px); box-shadow: 0 20px 40px rgba(13,110,253,0.06); }
+.job-card-item .badge{ font-size:0.75rem; }
+#jobsGrid .card{ min-height:170px; }
+
+/* Hero CTA spacing */
+.jobs-hero .btn-lg { padding: .75rem 1.1rem; }
+
+/* Collapsible filters spacing when collapsed on small screens */
+#filtersCollapse .card { margin-bottom: 12px; }
+
+/* Slightly larger job card title */
+.job-card-item .card-title { font-size: 1.05rem; font-weight: 700; }
+
+/* subtle divider between cards */
+.jobs-card { border: 1px solid rgba(0,0,0,0.04); }
+
+@media (max-width:991px){ .sticky-filter{ position:static; top:auto; } }
+
+/* Floating job contact bubble (like marketplace message CTA) */
+.job-contact-bubble{ position: fixed; left: 20px; bottom: 20px; z-index: 1050; background: #fff; border-radius: 999px; box-shadow: 0 8px 28px rgba(0,0,0,0.12); padding: 8px 12px; cursor: pointer; transition: transform .18s ease, opacity .18s ease; max-width: 360px; }
+.job-contact-bubble:hover{ transform: translateY(-4px); }
+.job-contact-bubble.d-none{ display: none; }
+.job-contact-bubble .bubble-avatar{ width:40px; height:40px; border-radius:50%; object-fit:cover; }
+.job-contact-bubble .bubble-name{ font-size: .92rem; }
+.job-contact-bubble .bubble-sub{ font-size: .78rem; }
+
+@media (max-width: 576px){ .job-contact-bubble{ left: 12px; right: 12px; max-width: calc(100% - 24px); } }

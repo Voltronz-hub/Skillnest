@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Management - SkillNest Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body>
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="container">
+    <h1 class="mb-4">User Management</h1>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Joined</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(user => { %>
+          <tr>
+            <td><%= user.username %></td>
+            <td><%= user.email %></td>
+            <td>
+              <span class="badge bg-<%= user.role === 'admin' ? 'danger' : user.role === 'freelancer' ? 'success' : 'primary' %>">
+                <%= user.role %>
+              </span>
+            </td>
+            <td>
+              <span class="badge bg-<%= user.isActive ? 'success' : 'secondary' %>">
+                <%= user.isActive ? 'Active' : 'Inactive' %>
+              </span>
+              <% if (user.suspended) { %>
+                <span class="badge bg-warning ms-1">Suspended</span>
+              <% } %>
+            </td>
+            <td><%= user.createdAt.toDateString() %></td>
+            <td>
+              <% if (user.suspended) { %>
+                <button class="btn btn-sm btn-success unsuspend-user me-1" data-user-id="<%= user._id %>">
+                  Unsuspend
+                </button>
+              <% } else { %>
+                <button class="btn btn-sm btn-warning suspend-user me-1" data-user-id="<%= user._id %>">
+                  Suspend
+                </button>
+              <% } %>
+              <button class="btn btn-sm btn-danger delete-user" data-user-id="<%= user._id %>">
+                Delete
+              </button>
+              <% if (user.role !== 'admin') { %>
+                <button class="btn btn-sm btn-primary make-admin ms-1" data-user-id="<%= user._id %>">Make admin</button>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+      <nav aria-label="User pagination">
+        <ul class="pagination justify-content-center">
+          <% if (hasPrev) { %>
+            <li class="page-item">
+              <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+            </li>
+          <% } %>
+
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+              <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+            </li>
+          <% } %>
+
+          <% if (hasNext) { %>
+            <li class="page-item">
+              <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+            </li>
+          <% } %>
+        </ul>
+      </nav>
+    <% } %>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Delete user functionality
+    document.querySelectorAll('.delete-user').forEach(button => {
+      button.addEventListener('click', async function() {
+        const userId = this.getAttribute('data-user-id');
+        if (confirm('Are you sure you want to delete this user?')) {
+          try {
+            const response = await fetch(`/admin/users/${userId}/delete`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            });
+            const result = await response.json();
+            if (result.success) {
+              alert('User deleted successfully');
+              location.reload();
+            } else {
+              alert('Error: ' + result.message);
+            }
+          } catch (error) {
+            alert('Error deleting user');
+          }
+        }
+      });
+    });
+
+    // Suspend/Unsuspend user functionality
+    document.querySelectorAll('.suspend-user, .unsuspend-user').forEach(button => {
+      button.addEventListener('click', async function() {
+        const userId = this.getAttribute('data-user-id');
+        const isSuspend = this.classList.contains('suspend-user');
+        const action = isSuspend ? 'suspend' : 'unsuspend';
+        if (confirm(`Are you sure you want to ${action} this user?`)) {
+          try {
+            const response = await fetch(`/admin/users/${userId}/suspend`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: `suspended=${isSuspend}`
+
+            // Make admin
+            document.querySelectorAll('.make-admin').forEach(button => {
+              button.addEventListener('click', async function() {
+                const userId = this.getAttribute('data-user-id');
+                if (!confirm('Promote this user to admin?')) return;
+                try {
+                  const resp = await fetch(`/admin/users/${userId}/role`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role: 'admin' })
+                  });
+                  const json = await resp.json();
+                  if (json.success) {
+                    alert('User promoted to admin');
+                    location.reload();
+                  } else {
+                    alert('Error: ' + json.message);
+                  }
+                } catch (err) {
+                  alert('Error promoting user');
+                }
+              });
+            });
+            });
+            const result = await response.json();
+            if (result.success) {
+              alert(`User ${action}ed successfully`);
+              location.reload();
+            } else {
+              alert('Error: ' + result.message);
+            }
+          } catch (error) {
+            alert(`Error ${action}ing user`);
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

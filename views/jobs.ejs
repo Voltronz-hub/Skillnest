@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SkillNest - Jobs</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+  <link href="/jobs.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <%- include('partials/navbar') %>
+  <a class="visually-hidden-focusable" href="#jobsGrid">Skip to job listings</a>
+
+  <main class="jobs-hero py-5" role="main" aria-labelledby="jobsHeading">
+    <div class="container">
+      <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+          <h1 id="jobsHeading" class="display-4 mb-1">Find your next project</h1>
+          <p class="text-muted lead mb-0">Browse curated jobs, save searches and get realtime alerts.</p>
+        </div>
+          <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <% if (user && role === 'freelancer') { %>
+            <a class="btn btn-accent btn-lg me-2" href="/jobs/post">Post a Job</a>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- filter toggle for small screens -->
+        <div class="col-12 d-lg-none mb-3">
+          <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse" aria-expanded="false" aria-controls="filtersCollapse">Show Filters</button>
+        </div>
+
+        <aside class="col-lg-3 mb-4">
+          <div id="filtersCollapse" class="collapse d-lg-block">
+            <div class="card p-3 sticky-filter">
+              <h2 class="h6 mb-3">Filters</h2>
+            <form id="filtersForm" role="search" aria-label="Filter jobs">
+              <div class="mb-2">
+                <label for="searchInput" class="visually-hidden">Search titles or tags</label>
+                <input id="searchInput" class="form-control" placeholder="Search titles or tags" aria-describedby="searchHelp">
+                <div id="searchHelp" class="form-text visually-hidden">Type keywords to filter job titles or tags.</div>
+              </div>
+                <div class="mb-2 d-flex gap-2">
+                <button id="saveSearchBtn" type="button" class="btn btn-sm btn-outline-primary">Save Search</button>
+                <button id="manageSearchesBtn" type="button" class="btn btn-sm btn-outline-secondary">Manage Searches</button>
+              </div>
+              <div class="mb-2">
+                <label for="roleFilter" class="visually-hidden">Role</label>
+                <select id="roleFilter" class="form-select" aria-label="Filter by role">
+                  <option value="">All roles</option>
+                  <option value="client">Client</option>
+                  <option value="freelancer">Freelancer</option>
+                </select>
+              </div>
+              <div class="d-grid">
+                <button id="clearFilters" type="button" class="btn btn-sm btn-outline-secondary">Clear</button>
+              </div>
+            </form>
+          </div>
+        </aside>
+
+        <section class="col-lg-9">
+          <div id="savedSearchesPanel" class="card mb-3 p-2 d-none" aria-hidden="true">
+            <div class="d-flex justify-content-between align-items-center">
+              <strong>Saved searches</strong>
+              <button id="closeSavedPanel" type="button" class="btn btn-sm btn-light">Close</button>
+            </div>
+            <div id="savedList" class="mt-2 small"></div>
+          </div>
+
+          <div id="jobsSkeleton" class="skeleton-grid mb-3 d-none" aria-hidden="true">
+            <!-- skeleton copies -->
+            <div class="skeleton-card"><div class="skeleton-line skeleton-title"></div><div class="skeleton-line skeleton-sub"></div><div class="skeleton-line skeleton-chip"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line skeleton-title"></div><div class="skeleton-line skeleton-sub"></div><div class="skeleton-line skeleton-chip"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line skeleton-title"></div><div class="skeleton-line skeleton-sub"></div><div class="skeleton-line skeleton-chip"></div></div>
+            <div class="skeleton-card"><div class="skeleton-line skeleton-title"></div><div class="skeleton-line skeleton-sub"></div><div class="skeleton-line skeleton-chip"></div></div>
+          </div>
+
+          <div id="jobsGrid" class="row g-4" role="region" aria-label="Job listings">
+            <% jobs.forEach(function(job) { %>
+              <article tabindex="0" class="col-md-6 col-lg-4 job-card-item" data-href="/jobs/<%= job._id %>" data-role="<%= job.role || '' %>" data-title="<%= (job.title || '').toLowerCase() %>" data-tags="<%= ((job.tags || []).join(' ')).toLowerCase() %>" data-verified="<%= job.client && (job.client.verified || job.client.verificationStatus === 'approved') ? 'true' : 'false' %>" aria-labelledby="job-<%= job._id %>-title">
+                <div class="card h-100 jobs-card shadow-sm hover-lift">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <h3 id="job-<%= job._id %>-title" class="h5 card-title mb-0"><a href="/jobs/<%= job._id %>" class="text-decoration-none text-dark"><%= job.title %></a></h3>
+                      <span class="badge bg-light text-muted small ms-2">Posted</span>
+                    </div>
+                    <p class="mb-2 small text-muted">by <span class="fw-bold user-link d-inline-flex align-items-center" data-user-id="<%= job.client && job.client._id ? job.client._id : (job.client && job.client.toString ? job.client.toString() : '') %>" role="button" tabindex="0" aria-label="Open profile of <%= job.client ? job.client.username : 'Unknown' %>">
+                      <%= job.client ? job.client.username : 'Unknown' %>
+                      <% if (job.client && (job.client.verified || job.client.verificationStatus === 'approved')) { %>
+                        <span class="badge bg-success ms-2" title="Verified">Vetted</span>
+                      <% } %>
+                    </span></p>
+                    <% if (job.description) { %>
+                      <p class="small text-muted mb-2"><%= (job.description.length > 120 ? job.description.substring(0,120) + '...' : job.description) %></p>
+                    <% } %>
+                    <% if (job.tags && job.tags.length) { %>
+                      <div class="mb-3" aria-hidden="false">
+                        <% job.tags.forEach(function(tag) { %>
+                          <span class="badge bg-secondary me-1"><%= tag %></span>
+                        <% }); %>
+                      </div>
+                    <% } %>
+                    <a href="/jobs/<%= job._id %>" class="btn btn-sm btn-primary" aria-label="View details for <%= job.title %>">View Details</a>
+                  </div>
+                </div>
+              </article>
+            <% }); %>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- Floating contact bubble to message selected job/client -->
+  <div id="jobContactBubble" class="job-contact-bubble d-none" role="button" tabindex="0" aria-label="Contact client">
+    <div class="bubble-inner d-flex align-items-center">
+      <img src="/Skillnest logo.png" alt="avatar" class="bubble-avatar">
+      <div class="bubble-text ms-2">
+        <div class="bubble-name small fw-semibold">Select a job</div>
+        <div class="bubble-sub small text-muted">Click a job to message</div>
+      </div>
+      <div class="ms-auto">
+        <button id="bubbleAction" type="button" class="btn btn-sm btn-dark">Message</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/jobs.js"></script>
+  <%- include('partials/site-footer') %>
+</body>
+</html>

@@ -1,0 +1,59 @@
+/* Profile Editing Styles */
+.profile-edit-form .form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.profile-edit-form .form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.profile-edit-form textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.profile-image-preview {
+  border: 3px solid #e9ecef;
+  transition: border-color 0.3s ease;
+}
+
+.profile-image-preview:hover {
+  border-color: #0d6efd;
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.skill-tag {
+  background: #e9ecef;
+  color: #495057;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.alert-success {
+  border-left: 4px solid #198754;
+}
+
+.alert-danger {
+  border-left: 4px solid #dc3545;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #198754, #20c997);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(25, 135, 84, 0.3);
+}

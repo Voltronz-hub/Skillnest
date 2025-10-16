@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillNest - Client Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <!-- Header -->
+  <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+        <img src="/Skillnest Logo Black and White.png" alt="SkillNest" height="40" class="me-2">
+        <span class="fs-4">SkillNest</span>
+      </a>
+      <div class="d-flex align-items-center">
+        <span class="me-3">Welcome, <%= user.username %></span>
+        <a class="btn btn-outline-primary me-2" href="/jobs/post">Post Job</a>
+        <div class="btn-group">
+          <button id="profileBtnClient" type="button" class="btn btn-light dropdown-toggle p-0 border-0" data-bs-toggle="dropdown" aria-expanded="false" style="width:40px;height:40px;border-radius:50%;overflow:hidden">
+            <% if (user && user.profileImage) { %>
+              <img src="/uploads/<%= user.profileImage %>" alt="Profile" style="width:40px;height:40px;object-fit:cover;">
+            <% } else { %>
+              <span class="d-inline-block bg-secondary text-white text-center" style="width:40px;height:40px;line-height:40px;border-radius:50%;"> <%= user.role ? user.role.charAt(0).toUpperCase() : 'U' %> </span>
+            <% } %>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="/profile/edit">Edit Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="/auth/logout">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container mt-4">
+    <h1 class="mb-4">Client Dashboard</h1>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card card-soft text-center">
+          <div class="card-body">
+            <i class="fas fa-briefcase fa-2x text-primary mb-2"></i>
+            <h5><%= postedJobs.length %></h5>
+            <p class="mb-0">Posted Jobs</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-soft text-center">
+          <div class="card-body">
+            <i class="fas fa-envelope fa-2x text-info mb-2"></i>
+            <h5><%= proposalsReceived.length %></h5>
+            <p class="mb-0">Proposals Received</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-soft text-center">
+          <div class="card-body">
+            <i class="fas fa-dollar-sign fa-2x text-success mb-2"></i>
+            <h5>MYR <%= totalPayments.toFixed(2) %></h5>
+            <p class="mb-0">Total Payments</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-soft text-center">
+          <div class="card-body">
+            <i class="fas fa-users fa-2x text-secondary mb-2"></i>
+            <h5><%= hiredFreelancersCount %></h5>
+            <p class="mb-0">Hired Freelancers</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="active-projects-tab" data-bs-toggle="tab" data-bs-target="#active-projects" type="button" role="tab">Active Projects</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="messages-tab" data-bs-toggle="tab" data-bs-target="#messages" type="button" role="tab">Messages</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">Payments</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="collaboration-tab" data-bs-toggle="tab" data-bs-target="#collaboration" type="button" role="tab">Collaboration Boards</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab">Notifications</button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="dashboardTabsContent">
+      <!-- Active Projects Tab -->
+      <div class="tab-pane fade show active" id="active-projects" role="tabpanel">
+        <h3>Active Projects</h3>
+        <% if (postedJobs.length > 0) { %>
+          <div class="row">
+            <% postedJobs.forEach(job => { %>
+              <div class="col-md-6 mb-3">
+                <div class="card card-soft">
+                  <div class="card-body">
+                    <h5 class="card-title"><%= job.title %></h5>
+                    <p class="card-text">Status: <span class="badge bg-<%= job.status === 'open' ? 'success' : job.status === 'in-progress' ? 'warning' : 'secondary' %>"><%= job.status %></span></p>
+                    <p class="card-text">Freelancer: <%= job.freelancer ? job.freelancer.username : 'Not assigned' %></p>
+                    <p class="card-text">Budget: MYR <%= job.budget || 'N/A' %></p>
+                    <a href="/jobs/<%= job._id %>" class="btn btn-primary">View Details</a>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <p class="text-muted">No active projects yet.</p>
+        <% } %>
+      </div>
+
+      <!-- Messages Tab -->
+      <div class="tab-pane fade" id="messages" role="tabpanel">
+        <h3>Messages</h3>
+        <div class="list-group">
+          <!-- Placeholder messages -->
+          <div class="list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">John Doe</h5>
+              <small>2 hours ago</small>
+            </div>
+            <p class="mb-1">Regarding the logo design project...</p>
+            <a href="/chat/1" class="btn btn-sm btn-primary">Reply</a>
+          </div>
+          <div class="list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">Jane Smith</h5>
+              <small>1 day ago</small>
+            </div>
+            <p class="mb-1">Proposal for web development...</p>
+            <a href="/chat/2" class="btn btn-sm btn-primary">Reply</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payments Tab -->
+      <div class="tab-pane fade" id="payments" role="tabpanel">
+        <h3>Payment Milestones</h3>
+        <div class="card card-soft mb-3">
+          <div class="card-body">
+            <h5>Project: Logo Design</h5>
+            <div class="mb-2">
+              <span>Milestone 1: Initial Draft</span>
+              <div class="progress">
+                <div class="progress-bar" style="width: 100%">Completed - MYR 200</div>
+              </div>
+            </div>
+            <div class="mb-2">
+              <span>Milestone 2: Revisions</span>
+              <div class="progress">
+                <div class="progress-bar" style="width: 50%">In Progress - MYR 150</div>
+              </div>
+            </div>
+            <div>
+              <span>Milestone 3: Final Delivery</span>
+              <div class="progress">
+                <div class="progress-bar bg-secondary" style="width: 0%">Pending - MYR 150</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card card-soft">
+          <div class="card-body">
+            <h5>Project: Website Development</h5>
+            <div class="mb-2">
+              <span>Milestone 1: Planning</span>
+              <div class="progress">
+                <div class="progress-bar" style="width: 100%">Completed - MYR 500</div>
+              </div>
+            </div>
+            <div>
+              <span>Milestone 2: Development</span>
+              <div class="progress">
+                <div class="progress-bar" style="width: 75%">In Progress - MYR 1000</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collaboration Boards Tab -->
+      <div class="tab-pane fade" id="collaboration" role="tabpanel">
+        <h3>Collaboration Boards</h3>
+        <div class="kanban-board">
+          <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h5>To Do</h5>
+            <div class="kanban-card" draggable="true" ondragstart="drag(event)" id="task1">
+              <p>Design wireframes</p>
+            </div>
+            <div class="kanban-card" draggable="true" ondragstart="drag(event)" id="task2">
+              <p>Write content</p>
+            </div>
+          </div>
+          <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h5>In Progress</h5>
+            <div class="kanban-card" draggable="true" ondragstart="drag(event)" id="task3">
+              <p>Develop homepage</p>
+            </div>
+          </div>
+          <div class="kanban-column" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h5>Done</h5>
+            <div class="kanban-card" draggable="true" ondragstart="drag(event)" id="task4">
+              <p>Setup project repository</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notifications Tab -->
+      <div class="tab-pane fade" id="notifications" role="tabpanel">
+        <h3>Notifications</h3>
+        <% if (notifications.length > 0) { %>
+          <div class="list-group">
+            <% notifications.forEach(notification => { %>
+              <div class="list-group-item <%= notification.read ? '' : 'list-group-item-warning' %>">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1"><%= notification.type %></h6>
+                  <small><%= notification.createdAt.toDateString() %></small>
+                </div>
+                <p class="mb-1"><%= notification.message %></p>
+                <% if (notification.link) { %>
+                  <a href="<%= notification.link %>" class="btn btn-sm btn-primary">View</a>
+                <% } %>
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <p class="text-muted">No notifications yet.</p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function drag(ev) {
+      ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      var data = ev.dataTransfer.getData("text");
+      ev.target.appendChild(document.getElementById(data));
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

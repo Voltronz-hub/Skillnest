@@ -1,0 +1,25 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+
+# Env files
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# Uploaded files (use external storage in production)
+uploads/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/

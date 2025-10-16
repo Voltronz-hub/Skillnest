@@ -1,0 +1,24 @@
+{
+  "name": "skillnest",
+  "version": "1.0.0",
+  "description": "Freelancer marketplace web application",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "vercel dev",
+    "vercel-build": "echo 'no build step'"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-mongo": "^4.6.0",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "mongodb": "^6.18.0",
+    "mongoose": "^7.0.3",
+    "multer": "^2.0.2",
+    "socket.io": "^4.7.2",
+    "dotenv": "^16.3.1",
+    "serverless-http": "^3.0.0"
+  }
+}

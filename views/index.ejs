@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SkillNest - Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <%- include('partials/navbar') %>
+  <header class="hero-section py-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-6 text-start">
+          <h1 class="display-4 fw-bold mb-3">Build, Hire, and Grow — all in one place</h1>
+          <p class="lead mb-4 text-muted">SkillNest connects businesses and top freelance talent. Post jobs, receive curated proposals, collaborate in real-time, and pay securely.</p>
+          <div class="d-flex gap-2 mb-4">
+            <% if (!user) { %>
+              <a href="/auth/register" class="btn btn-accent btn-lg">Get Started</a>
+              <a href="/jobs" class="btn btn-outline-primary btn-lg">Browse Jobs</a>
+            <% } else { %>
+              <a href="/jobs" class="btn btn-accent btn-lg">Browse Jobs</a>
+              <a href="/profile/edit" class="btn btn-outline-secondary btn-lg">Edit Profile</a>
+            <% } %>
+          </div>
+          <div class="d-flex flex-wrap gap-3">
+            <div class="badge badge-soft px-3 py-2">Trusted freelancers</div>
+            <div class="badge badge-soft px-3 py-2">Secure payments</div>
+            <div class="badge badge-soft px-3 py-2">Real-time chat</div>
+          </div>
+        </div>
+        <div class="col-lg-6 text-center">
+            <div class="col-lg-6 text-center">
+                <!-- Custom collaborative SVG illustration with subtle motion -->
+                <div class="hero-gradient float-y" style="display:inline-block;border-radius:18px;">
+                  <svg width="420" height="300" viewBox="0 0 420 300" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="bgGrad" x1="0" x2="1">
+                        <stop offset="0%" stop-color="#eafaf0" />
+                        <stop offset="100%" stop-color="#f3f8ff" />
+                      </linearGradient>
+                      <linearGradient id="accentGrad" x1="0" x2="1">
+                        <stop offset="0%" stop-color="#1f8a59" />
+                        <stop offset="100%" stop-color="#1e88e5" />
+                      </linearGradient>
+                    </defs>
+                    <rect x="0" y="0" width="420" height="300" rx="18" fill="url(#bgGrad)" />
+
+                    <!-- stylized connected nodes representing collaboration -->
+                    <g transform="translate(40,40)">
+                      <circle cx="40" cy="40" r="22" fill="#fff" stroke="#e6f0ef" />
+                      <circle cx="160" cy="20" r="14" fill="#fff" stroke="#e6f0ef" />
+                      <circle cx="260" cy="80" r="18" fill="#fff" stroke="#e6f0ef" />
+                      <circle cx="100" cy="140" r="26" fill="#fff" stroke="#e6f0ef" />
+                      <circle cx="320" cy="160" r="20" fill="#fff" stroke="#e6f0ef" />
+
+                      <!-- connecting lines -->
+                      <path d="M60 48 L150 28" stroke="url(#accentGrad)" stroke-width="2" stroke-linecap="round" opacity="0.6" />
+                      <path d="M170 32 L250 88" stroke="url(#accentGrad)" stroke-width="2" stroke-linecap="round" opacity="0.5" />
+                      <path d="M120 150 L240 92" stroke="url(#accentGrad)" stroke-width="2" stroke-linecap="round" opacity="0.45" />
+                      <path d="M110 66 L100 120" stroke="#cfeee0" stroke-width="1.5" stroke-linecap="round" opacity="0.6" />
+                    </g>
+
+                    <!-- small animated pulse on main node -->
+                    <g transform="translate(60,60)">
+                      <circle cx="0" cy="0" r="24" fill="url(#accentGrad)" opacity="0.16">
+                        <animate attributeName="r" values="24;34;24" dur="6s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" values="0.16;0.06;0.16" dur="6s" repeatCount="indefinite" />
+                      </circle>
+                      <circle cx="0" cy="0" r="12" fill="url(#accentGrad)" />
+                    </g>
+
+                    <!-- abstract card to suggest profiles/proposals -->
+                    <rect x="120" y="160" width="200" height="90" rx="10" fill="#fff" stroke="#e6f0ef" />
+                    <rect x="136" y="176" width="140" height="12" rx="6" fill="#f0f6ff" />
+                    <rect x="136" y="196" width="100" height="10" rx="6" fill="#f6fbf9" />
+
+                  </svg>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="container mt-5">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card card-soft p-4 h-100">
+          <h5 class="mb-2">Post a job</h5>
+          <p class="text-muted">Describe your project, set a budget, and get proposals from qualified freelancers.</p>
+          <a href="/jobs" class="stretched-link text-decoration-none">Explore jobs</a>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-soft p-4 h-100">
+          <h5 class="mb-2">Hire confidently</h5>
+          <p class="text-muted">Use milestone-based escrow and verified freelancers to reduce risk.</p>
+          <a href="/profiles" class="stretched-link text-decoration-none">Find talent</a>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-soft p-4 h-100">
+          <h5 class="mb-2">Collaborate faster</h5>
+          <p class="text-muted">Real-time chat and file sharing keep your projects on track.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container mt-5 mb-5">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+          <!-- Testimonials carousel -->
+          <div id="testimonials" class="testimonials-carousel">
+            <div class="testimonial-item active">
+              <p class="mb-0">"SkillNest helped us find a contractor who delivered quality work on time. The milestone escrow and chat made coordination effortless."</p>
+              <small class="d-block mt-2 text-muted">Acme Co — Product Lead</small>
+            </div>
+            <div class="testimonial-item">
+              <p class="mb-0">"We doubled our delivery capacity using freelancers from SkillNest. The platform's messaging kept things organized."</p>
+              <small class="d-block mt-2 text-muted">BetaShop — CTO</small>
+            </div>
+            <div class="testimonial-item">
+              <p class="mb-0">"Fast, reliable, and the support team was helpful during onboarding."</p>
+              <small class="d-block mt-2 text-muted">SoloFounder — CEO</small>
+            </div>
+          </div>
+      </div>
+      <div class="col-md-4 text-end">
+        <% if (user && typeof profileImage !== 'undefined' && profileImage) { %>
+          <img src="/uploads/<%= profileImage %>" alt="Profile Image" class="rounded-circle" style="width:80px;height:80px;object-fit:cover;">
+        <% } %>
+      </div>
+    </div>
+  </section>
+  <%- include('partials/site-footer') %>
+</body>
+</html>

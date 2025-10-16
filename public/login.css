@@ -1,0 +1,59 @@
+/* Styles for unique login page */
+:root{
+  --accent:#0d6efd;
+  --accent-2:#6f42c1;
+  --card-bg: #ffffff;
+}
+
+.login-hero{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: linear-gradient(135deg, rgba(13,110,253,0.06) 0%, rgba(111,66,193,0.04) 100%);
+  padding:2rem;
+  box-sizing:border-box;
+}
+
+.login-grid{ max-width:1100px; }
+
+/* Center the content horizontally and vertically */
+.login-grid{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:2rem;
+}
+
+.brand{
+  background: linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+  border-radius:12px;
+  padding:2rem;
+}
+.brand-logo{ width:120px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.08)); }
+.brand-title{ font-weight:700; font-size:1.75rem; color:var(--accent-2); }
+.brand-sub{ color:#6c757d; }
+
+.login-card{ width:100%; max-width:420px; border-radius:12px; overflow:hidden; }
+.login-card .card-body{ background: linear-gradient(180deg,#fff,#fbfbff); }
+
+.form-control:focus{ box-shadow:0 0 0 0.15rem rgba(13,110,253,0.15); border-color:var(--accent); }
+
+.pwd-toggle{
+  position:absolute;
+  right:10px; top:8px;
+  transform:translateY(6px);
+}
+
+.btn-primary{
+  background: linear-gradient(90deg,var(--accent),#1e88e5);
+  border: none;
+  box-shadow: 0 6px 18px rgba(13,110,253,0.12);
+}
+
+.login-card .small{ color:#5a5f66; }
+
+@media (max-width:767px){
+  .brand{ display:none; }
+  .login-card{ margin:1rem; }
+}
