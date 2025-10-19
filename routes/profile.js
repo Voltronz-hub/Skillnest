@@ -40,7 +40,9 @@ router.get('/edit', async (req, res) => {
   if (!req.session.userId) return res.redirect('/auth/login');
   const user = await User.findById(req.session.userId).lean();
   if (!user) return res.redirect('/auth/login');
-  res.render('edit-profile', { profile: user, profileImage: user.profileImage, verificationStatus: user.verificationStatus || 'none', verificationDocs: user.verificationDocs || [], user: user, role: user.role });
+  const flash = req.session.userFlash || null;
+  delete req.session.userFlash;
+  res.render('edit-profile', { profile: user, profileImage: user.profileImage, verificationStatus: user.verificationStatus || 'none', verificationDocs: user.verificationDocs || [], user: user, role: user.role, flash });
 });
 
 // Public: list freelancers (Find talent)

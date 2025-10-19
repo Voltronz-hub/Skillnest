@@ -1,4 +1,7 @@
 const express = require('express');
+// Performance & security
+const compression = require('compression');
+const helmet = require('helmet');
 require('dotenv').config();
 const mongoose = require('mongoose');
 const session = require('express-session');
@@ -10,6 +13,16 @@ const path = require('path');
 const User = require('./models/User');
 
 const app = express();
+
+// Basic production hardening & performance
+app.disable('x-powered-by');
+// Use compression and helmet early in the middleware chain when running in production
+if (process.env.NODE_ENV === 'production') {
+  try { app.use(helmet()); } catch (e) { /* ignore if not installed */ }
+  try { app.use(compression()); } catch (e) { /* ignore if not installed */ }
+  // Enable view caching for template engine
+  app.set('view cache', true);
+}
 // Note: server and socket.io are only created when running the app directly
 // (not when imported by a serverless wrapper such as Vercel). This lets us
 // export the Express `app` for serverless platforms while still supporting
@@ -26,7 +39,9 @@ mongoose.connect(mongoUrl, {
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static assets with aggressive caching in production
+const staticOpts = process.env.NODE_ENV === 'production' ? { maxAge: 1000 * 60 * 60 * 24 * 7 } : {};
+app.use(express.static(path.join(__dirname, 'public'), staticOpts));
 app.use(express.urlencoded({ extended: true }));
 
 // Session setup (export middleware so Socket.IO can reuse it)

@@ -16,6 +16,9 @@
             <% if (typeof error !== 'undefined' && error) { %>
               <div class="alert alert-danger"><%= error %></div>
             <% } %>
+            <% if (typeof flash !== 'undefined' && flash) { %>
+              <div class="alert alert-warning"><%= flash %></div>
+            <% } %>
             <form method="POST" action="/profile/edit" enctype="multipart/form-data">
               <div class="mb-3 text-center">
                 <% if (profile && profile.profileImage) { %>

@@ -19,6 +19,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 const SavedSearch = require('../models/SavedSearch');
 const Notification = require('../models/Notification');
+const requireProfileComplete = require('../middleware/requireProfileComplete');
 
 // List jobs
 router.get('/', async (req, res) => {
@@ -43,7 +44,8 @@ router.get('/post', (req, res) => {
   res.render('post-job');
 });
 
-router.post('/post', upload.single('attachment'), async (req, res) => {
+// Require freelancer profile completeness before posting
+router.post('/post', requireProfileComplete('freelancer'), upload.single('attachment'), async (req, res) => {
   if (req.session.role !== 'freelancer') return res.redirect('/jobs');
   const { title, description } = req.body;
   let attachment = null;

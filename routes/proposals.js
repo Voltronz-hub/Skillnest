@@ -3,9 +3,10 @@ const router = express.Router();
 const Proposal = require('../models/Proposal');
 const Job = require('../models/Job');
 const Contract = require('../models/Contract');
+const requireProfileComplete = require('../middleware/requireProfileComplete');
 
 // Submit proposal (freelancer only)
-router.post('/submit', async (req, res) => {
+router.post('/submit', requireProfileComplete('freelancer'), async (req, res) => {
   if (req.session.role !== 'freelancer') return res.redirect('/jobs');
   const { jobId, message } = req.body;
   const proposal = new Proposal({ job: jobId, freelancer: req.session.userId, message });
@@ -25,6 +26,8 @@ router.post('/accept', async (req, res) => {
 // Client hires a freelancer for a proposal (sets status to 'hired')
 router.post('/:id/hire', async (req, res) => {
   try {
+    // ensure client profile complete before hiring
+    await requireProfileComplete('client')(req, res, async () => {});
     if (req.session.role !== 'client') return res.status(403).send('Forbidden');
     const id = req.params.id;
     const p = await Proposal.findById(id).populate('job');
