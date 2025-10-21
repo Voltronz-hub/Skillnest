@@ -22,6 +22,38 @@ if (process.env.NODE_ENV === 'production') {
   // Enable view caching for template engine
   app.set('view cache', true);
 }
+try {
+  if (process.env.NODE_ENV === 'production') {
+    // In production, enable Helmet with a CSP that allows the Bootstrap CDN and typical assets.
+    // Adjust these directives if you add other external providers (analytics, fonts, etc.).
+      try {
+      app.use(helmet({
+        contentSecurityPolicy: {
+          directives: {
+            defaultSrc: ["'self'"],
+            // Allow common CDNs used for JS/CSS
+            scriptSrc: ["'self'", 'https://cdn.jsdelivr.net', 'https://cdnjs.cloudflare.com', 'https://unpkg.com'],
+            styleSrc: ["'self'", 'https://cdn.jsdelivr.net', 'https://cdnjs.cloudflare.com', 'https://unpkg.com', 'https://fonts.googleapis.com', "'unsafe-inline'"],
+            imgSrc: ["'self'", 'data:', 'https://images.unsplash.com'],
+            connectSrc: ["'self'", 'https://api.ipify.org'],
+            fontSrc: ["'self'", 'https://cdn.jsdelivr.net', 'https://fonts.gstatic.com'],
+            objectSrc: ["'none'"],
+            frameSrc: ["'self'"],
+            upgradeInsecureRequests: []
+          }
+        }
+      }));
+    } catch (e) {
+      // If helmet or CSP is not available/configured, fall back to default helmet()
+      try { app.use(helmet()); } catch (e2) { /* ignore */ }
+    }
+    app.set('view cache', true);
+  } else {
+    // In development, disable CSP to avoid blocking DevTools and local tooling
+    try { app.use(helmet({ contentSecurityPolicy: false })); } catch (e) { try { app.use(helmet()); } catch(e2) { /* ignore */ } }
+  }
+} catch (e) { /* ignore if not installed */ }
+try { app.use(compression()); } catch (e) { /* ignore if not installed */ }
 // Note: server and socket.io are only created when running the app directly
 // (not when imported by a serverless wrapper such as Vercel). This lets us
 // export the Express `app` for serverless platforms while still supporting
