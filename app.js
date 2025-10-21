@@ -6,7 +6,6 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const bcrypt = require('bcryptjs');
 const http = require('http');
 const socketio = require('socket.io');
 const path = require('path');
@@ -32,9 +31,16 @@ const Job = require('./models/Job');
 
 // MongoDB connection
 const mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017/skillnest-dev';
+// Add shorter server selection timeout to fail fast on DNS/resolution issues
 mongoose.connect(mongoUrl, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  // Fail quickly if DNS lookup or server selection takes too long (ms)
+  serverSelectionTimeoutMS: parseInt(process.env.MONGO_SERVER_SELECTION_TIMEOUT_MS || '5000', 10),
+  socketTimeoutMS: parseInt(process.env.MONGO_SOCKET_TIMEOUT_MS || '45000', 10)
+}).catch(err => {
+  console.error('MongoDB connection error (startup):', err && err.message ? err.message : err);
+  // Keep process exit behavior to the caller but log helpful guidance
 });
 
 app.set('view engine', 'ejs');

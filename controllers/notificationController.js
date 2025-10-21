@@ -3,7 +3,8 @@ const User = require('../models/User');
 const nodemailer = require('nodemailer');
 
 // Create an email transporter (configure with your email service)
-const transporter = nodemailer.createTransporter({
+// use createTransport (nodemailer API)
+const transporter = nodemailer.createTransport({
   service: 'gmail', // or your email service
   auth: {
     user: process.env.EMAIL_USER,
