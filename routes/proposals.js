@@ -27,7 +27,8 @@ router.post('/accept', async (req, res) => {
 router.post('/:id/hire', async (req, res) => {
   try {
     // ensure client profile complete before hiring
-    await requireProfileComplete('client')(req, res, async () => {});
+    // require profile completeness and admin approval for clients to hire
+    await requireProfileComplete('client', { requireAdminApproval: true })(req, res, async () => {});
     if (req.session.role !== 'client') return res.status(403).send('Forbidden');
     const id = req.params.id;
     const p = await Proposal.findById(id).populate('job');

@@ -2,7 +2,9 @@ const User = require('../models/User');
 
 // Middleware factory: checks profile completeness based on role
 // roleRequired: 'freelancer' or 'client'
-module.exports = function(roleRequired) {
+// roleRequired: 'freelancer' or 'client'
+// options: { requireAdminApproval: true }
+module.exports = function(roleRequired, options = {}) {
   return async function(req, res, next) {
     try {
       if (!req.session || !req.session.userId) return res.redirect('/auth/login');
@@ -20,11 +22,25 @@ module.exports = function(roleRequired) {
           req.session.userFlash = 'Please complete your freelancer profile (name, image, skills, hourly rate) before taking this action.';
           return res.redirect('/profile/edit');
         }
+        // If admin approval required, block until approved
+        if (options.requireAdminApproval) {
+          if (!user.verificationStatus || user.verificationStatus !== 'approved') {
+            req.session.userFlash = 'Your freelancer profile is pending admin approval. You will be able to post jobs after an admin approves your profile.';
+            return res.redirect('/profile/edit');
+          }
+        }
       } else if (roleRequired === 'client') {
         const hasCompanyOrName = !!(user.company || user.name);
         if (!(hasName && hasImage && hasCompanyOrName)) {
           req.session.userFlash = 'Please complete your client profile (name, image and company) before taking this action.';
           return res.redirect('/profile/edit');
+        }
+        // If admin approval required, block until approved
+        if (options.requireAdminApproval) {
+          if (!user.verificationStatus || user.verificationStatus !== 'approved') {
+            req.session.userFlash = 'Your account is pending admin approval. You will be able to hire freelancers after an admin approves your profile.';
+            return res.redirect('/profile/edit');
+          }
         }
       } else {
         // generic check

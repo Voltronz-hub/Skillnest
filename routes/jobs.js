@@ -45,7 +45,8 @@ router.get('/post', (req, res) => {
 });
 
 // Require freelancer profile completeness before posting
-router.post('/post', requireProfileComplete('freelancer'), upload.single('attachment'), async (req, res) => {
+// Require freelancer profile complete and admin approval before posting a job
+router.post('/post', requireProfileComplete('freelancer', { requireAdminApproval: true }), upload.single('attachment'), async (req, res) => {
   if (req.session.role !== 'freelancer') return res.redirect('/jobs');
   const { title, description } = req.body;
   let attachment = null;
