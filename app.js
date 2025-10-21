@@ -63,29 +63,35 @@ app.use(sessionMiddleware);
 
 // Make logged-in user available to all views via res.locals
 app.use(async (req, res, next) => {
+  // Set minimal authenticated state from session immediately so UI can
+  // render login/logout controls even when the DB is unreachable.
+  if (req.session && req.session.userId) {
+    res.locals.user = { _id: req.session.userId };
+    res.locals.role = req.session.role || null;
+    res.locals.profileImage = null;
+  } else {
+    res.locals.user = null;
+    res.locals.role = null;
+    res.locals.profileImage = null;
+  }
+
   try {
+    // Attempt to enrich res.locals.user with full user data from DB.
+    // If this fails (DB down), keep the minimal session-derived values so
+    // templates still know the user is signed in.
     if (req.session && req.session.userId) {
       const u = await User.findById(req.session.userId).lean();
       if (u) {
         res.locals.user = u;
         res.locals.role = u.role;
         res.locals.profileImage = u.profileImage;
-      } else {
-        res.locals.user = null;
-        res.locals.role = null;
-        res.locals.profileImage = null;
       }
-    } else {
-      res.locals.user = null;
-      res.locals.role = null;
-      res.locals.profileImage = null;
     }
   } catch (err) {
-    console.error('res.locals user middleware error:', err);
-    res.locals.user = null;
-    res.locals.role = null;
-    res.locals.profileImage = null;
+    console.error('res.locals user middleware error (DB lookup):', err && err.message ? err.message : err);
+    // Keep minimal res.locals values from session rather than clearing them.
   }
+
   next();
 });
 
