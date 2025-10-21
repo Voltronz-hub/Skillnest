@@ -16,7 +16,8 @@
             <% } else if (typeof user !== 'undefined' && user && user.profileImage) { %>
               <img src="/uploads/<%= user.profileImage %>" alt="Profile" style="width:44px;height:44px;object-fit:cover;">
             <% } else { %>
-              <span class="d-inline-block bg-secondary text-white text-center" style="width:44px;height:44px;line-height:44px;border-radius:50%"> <%= (typeof role !== 'undefined' && role ? role.charAt(0).toUpperCase() : 'U') %> </span>
+              <!-- Use public logo as a visual fallback to avoid broken upload links -->
+              <img src="/Skillnest logo.png" alt="Profile" style="width:44px;height:44px;object-fit:cover;">
             <% } %>
           </button>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileBtnPartial" role="menu">
