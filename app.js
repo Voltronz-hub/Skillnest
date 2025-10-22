@@ -60,6 +60,7 @@ try { app.use(compression()); } catch (e) { /* ignore if not installed */ }
 // a normal HTTP + Socket.IO server when run with `node app.js`.
 const Message = require('./models/Message');
 const Job = require('./models/Job');
+const fs = require('fs');
 
 // MongoDB connection
 const mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost:27017/skillnest-dev';
@@ -86,7 +87,25 @@ app.use(express.json());
 
 // Serve uploaded files (user profile images, docs, etc.) from /uploads
 // Note: uploads/ is in .gitignore and is ephemeral in some hosts. Use S3 for production.
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'), staticOpts));
+// If a requested file under /uploads doesn't exist (common on ephemeral hosts),
+// serve a safe fallback image instead of returning a server error.
+app.use('/uploads', (req, res, next) => {
+  try {
+    const relPath = decodeURIComponent(req.path || '').replace(/^\/+/, '');
+    const fullPath = path.join(__dirname, 'uploads', relPath);
+    fs.stat(fullPath, (err, stats) => {
+      if (err || !stats || !stats.isFile()) {
+        // Serve public logo as a safe fallback for missing files
+        return res.sendFile(path.join(__dirname, 'public', 'Skillnest logo.png'));
+      }
+      // File exists, let express.static handle it
+      next();
+    });
+  } catch (e) {
+    // On any unexpected error, fall back to static handler
+    next();
+  }
+}, express.static(path.join(__dirname, 'uploads'), staticOpts));
 
 // Session setup (export middleware so Socket.IO can reuse it)
 const sessionMiddleware = session({

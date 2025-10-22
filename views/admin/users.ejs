@@ -130,31 +130,7 @@
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
               },
-              body: `suspended=${isSuspend}`
-
-            // Make admin
-            document.querySelectorAll('.make-admin').forEach(button => {
-              button.addEventListener('click', async function() {
-                const userId = this.getAttribute('data-user-id');
-                if (!confirm('Promote this user to admin?')) return;
-                try {
-                  const resp = await fetch(`/admin/users/${userId}/role`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ role: 'admin' })
-                  });
-                  const json = await resp.json();
-                  if (json.success) {
-                    alert('User promoted to admin');
-                    location.reload();
-                  } else {
-                    alert('Error: ' + json.message);
-                  }
-                } catch (err) {
-                  alert('Error promoting user');
-                }
-              });
-            });
+              body: `suspended=${isSuspend ? '1' : '0'}`
             });
             const result = await response.json();
             if (result.success) {
@@ -166,6 +142,30 @@
           } catch (error) {
             alert(`Error ${action}ing user`);
           }
+        }
+      });
+    });
+
+    // Make admin
+    document.querySelectorAll('.make-admin').forEach(button => {
+      button.addEventListener('click', async function() {
+        const userId = this.getAttribute('data-user-id');
+        if (!confirm('Promote this user to admin?')) return;
+        try {
+          const resp = await fetch(`/admin/users/${userId}/role`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role: 'admin' })
+          });
+          const json = await resp.json();
+          if (json.success) {
+            alert('User promoted to admin');
+            location.reload();
+          } else {
+            alert('Error: ' + json.message);
+          }
+        } catch (err) {
+          alert('Error promoting user');
         }
       });
     });

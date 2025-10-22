@@ -19,6 +19,9 @@
             <% if (typeof flash !== 'undefined' && flash) { %>
               <div class="alert alert-warning"><%= flash %></div>
             <% } %>
+            <% if (typeof verificationStatus !== 'undefined' && verificationStatus === 'rejected' && typeof verificationRejectReason !== 'undefined' && verificationRejectReason) { %>
+              <div class="alert alert-danger">Your profile was rejected by an admin: <strong><%= verificationRejectReason %></strong>. Please update your profile and re-upload documents for review.</div>
+            <% } %>
             <form method="POST" action="/profile/edit" enctype="multipart/form-data">
               <div class="mb-3 text-center">
                 <% if (profile && profile.profileImage) { %>

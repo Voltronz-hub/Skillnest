@@ -46,7 +46,8 @@ router.get('/verifications', requireAdmin, async (req, res) => {
 router.post('/verifications/:id/approve', requireAdmin, async (req, res) => {
   try {
     const id = req.params.id;
-    await User.findByIdAndUpdate(id, { verificationStatus: 'approved', verified: true });
+    // approve and clear any previous rejection reason
+    await User.findByIdAndUpdate(id, { verificationStatus: 'approved', verified: true, verificationRejectReason: null });
     req.session.adminFlash = `User ${id} approved.`;
     res.redirect('/admin/verifications');
   } catch (err) {
@@ -60,7 +61,8 @@ router.post('/verifications/:id/reject', requireAdmin, async (req, res) => {
   try {
     const id = req.params.id;
     const reason = req.body.reason || null;
-    await User.findByIdAndUpdate(id, { verificationStatus: 'rejected', verified: false });
+    // mark rejected and save the provided reason so the user can see it
+    await User.findByIdAndUpdate(id, { verificationStatus: 'rejected', verified: false, verificationRejectReason: reason });
     req.session.adminFlash = `User ${id} rejected.` + (reason ? ` Reason: ${reason}` : '');
     res.redirect('/admin/verifications');
   } catch (err) {
@@ -179,7 +181,8 @@ router.get('/users/:id/review', requireAdmin, async (req, res) => {
 router.post('/users/:id/approve', requireAdmin, async (req, res) => {
   try {
     const id = req.params.id;
-    await User.findByIdAndUpdate(id, { verificationStatus: 'approved', verified: true });
+    // approve and clear any previous rejection reason
+    await User.findByIdAndUpdate(id, { verificationStatus: 'approved', verified: true, verificationRejectReason: null });
     req.session.adminFlash = `User ${id} approved.`;
     res.redirect('/admin/users');
   } catch (err) {

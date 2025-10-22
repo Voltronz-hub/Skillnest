@@ -42,7 +42,7 @@ router.get('/edit', async (req, res) => {
   if (!user) return res.redirect('/auth/login');
   const flash = req.session.userFlash || null;
   delete req.session.userFlash;
-  res.render('edit-profile', { profile: user, profileImage: user.profileImage, verificationStatus: user.verificationStatus || 'none', verificationDocs: user.verificationDocs || [], user: user, role: user.role, flash });
+  res.render('edit-profile', { profile: user, profileImage: user.profileImage, verificationStatus: user.verificationStatus || 'none', verificationDocs: user.verificationDocs || [], verificationRejectReason: user.verificationRejectReason || null, user: user, role: user.role, flash });
 });
 
 // Public: list freelancers (Find talent)

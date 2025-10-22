@@ -24,6 +24,10 @@ module.exports = function(roleRequired, options = {}) {
         }
         // If admin approval required, block until approved
         if (options.requireAdminApproval) {
+          if (user.verificationStatus === 'rejected') {
+            req.session.userFlash = 'Your profile has been rejected by an admin. Please update your information and upload the requested documents for re-review.';
+            return res.redirect('/profile/edit');
+          }
           if (!user.verificationStatus || user.verificationStatus !== 'approved') {
             req.session.userFlash = 'Your freelancer profile is pending admin approval. You will be able to post jobs after an admin approves your profile.';
             return res.redirect('/profile/edit');
@@ -37,6 +41,10 @@ module.exports = function(roleRequired, options = {}) {
         }
         // If admin approval required, block until approved
         if (options.requireAdminApproval) {
+          if (user.verificationStatus === 'rejected') {
+            req.session.userFlash = 'Your profile has been rejected by an admin. Please update your information and upload the requested documents for re-review.';
+            return res.redirect('/profile/edit');
+          }
           if (!user.verificationStatus || user.verificationStatus !== 'approved') {
             req.session.userFlash = 'Your account is pending admin approval. You will be able to hire freelancers after an admin approves your profile.';
             return res.redirect('/profile/edit');
