@@ -9,7 +9,9 @@
   <div class="container py-5">
     <div class="card card-soft p-4">
       <div class="d-flex align-items-center">
-        <img src="/uploads/<%= profile.profileImage || 'placeholder.png' %>" alt="<%= profile.username %>" class="rounded-circle me-3" style="width:100px;height:100px;object-fit:cover;">
+  <% const profileImg = profile && profile.profileImage ? profile.profileImage : 'placeholder.png'; %>
+  <% const profileImgSrc = (profileImg && profileImg.toString().startsWith('http')) ? profileImg : ('/uploads/' + profileImg); %>
+  <img src="<%= profileImgSrc %>" alt="<%= profile.username %>" class="rounded-circle me-3" style="width:100px;height:100px;object-fit:cover;">
         <div>
           <h3 class="mb-0"><%= profile.username %> <% if (profile && (profile.verified || profile.verificationStatus === 'approved')) { %><span class="badge bg-success ms-2">Verified</span><% } %></h3>
           <small class="text-muted">Joined <%= new Date(profile.createdAt).toLocaleDateString() %></small>
@@ -41,7 +43,8 @@
           <h5>Portfolio</h5>
           <div class="d-flex flex-wrap gap-2 mt-2">
             <% profile.portfolio.forEach(function(p) { %>
-              <a href="/uploads/<%= p %>" target="_blank" class="portfolio-thumb"><img src="/uploads/<%= p %>" style="width:120px;height:80px;object-fit:cover;border-radius:.4rem"/></a>
+              <% const pHref = (p && p.toString().startsWith('http')) ? p : ('/uploads/' + p); %>
+              <a href="<%= pHref %>" target="_blank" class="portfolio-thumb"><img src="<%= pHref %>" style="width:120px;height:80px;object-fit:cover;border-radius:.4rem"/></a>
             <% }) %>
           </div>
         </div>

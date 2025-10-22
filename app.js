@@ -81,6 +81,12 @@ app.set('views', path.join(__dirname, 'views'));
 const staticOpts = process.env.NODE_ENV === 'production' ? { maxAge: 1000 * 60 * 60 * 24 * 7 } : {};
 app.use(express.static(path.join(__dirname, 'public'), staticOpts));
 app.use(express.urlencoded({ extended: true }));
+// Parse JSON bodies for API endpoints (used by admin UI fetch calls)
+app.use(express.json());
+
+// Serve uploaded files (user profile images, docs, etc.) from /uploads
+// Note: uploads/ is in .gitignore and is ephemeral in some hosts. Use S3 for production.
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), staticOpts));
 
 // Session setup (export middleware so Socket.IO can reuse it)
 const sessionMiddleware = session({

@@ -11,10 +11,14 @@
         </button>
         <div class="btn-group">
           <button id="profileBtnPartial" type="button" class="btn btn-light dropdown-toggle p-0 border-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:44px;height:44px;border-radius:50%;overflow:hidden">
-            <% if (typeof profileImage !== 'undefined' && profileImage) { %>
-              <img src="/uploads/<%= profileImage %>" alt="Profile" style="width:44px;height:44px;object-fit:cover;">
-            <% } else if (typeof user !== 'undefined' && user && user.profileImage) { %>
-              <img src="/uploads/<%= user.profileImage %>" alt="Profile" style="width:44px;height:44px;object-fit:cover;">
+            <% 
+              let navImg = null;
+              if (typeof profileImage !== 'undefined' && profileImage) navImg = profileImage;
+              else if (typeof user !== 'undefined' && user && user.profileImage) navImg = user.profileImage;
+            %>
+            <% if (navImg) { %>
+              <% const navImgSrc = (navImg && navImg.toString().startsWith('http')) ? navImg : ('/uploads/' + navImg); %>
+              <img src="<%= navImgSrc %>" alt="Profile" style="width:44px;height:44px;object-fit:cover;">
             <% } else { %>
               <!-- Use public logo as a visual fallback to avoid broken upload links -->
               <img src="/Skillnest logo.png" alt="Profile" style="width:44px;height:44px;object-fit:cover;">

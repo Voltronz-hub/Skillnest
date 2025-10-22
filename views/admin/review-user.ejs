@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Review User - SkillNest Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body>
+  <%- include('../partials/admin-navbar') %>
+
+  <div class="container mt-4">
+    <h1>Review user: <%= user.username %></h1>
+    <div class="card mt-3 p-3">
+      <p><strong>Email:</strong> <%= user.email %></p>
+      <p><strong>Role:</strong> <%= user.role %></p>
+      <p><strong>Joined:</strong> <%= user.createdAt ? user.createdAt.toDateString() : 'unknown' %></p>
+      <p><strong>Verification status:</strong> <%= user.verificationStatus || 'none' %></p>
+      <% if (user.profileImage) { %>
+        <img src="<%= user.profileImage.toString().startsWith('http') ? user.profileImage : ('/uploads/' + user.profileImage) %>" style="width:120px;height:120px;object-fit:cover;border-radius:6px" />
+      <% } %>
+      <hr />
+      <div class="mt-3">
+        <form method="POST" action="/admin/users/<%= user._id %>/reject">
+          <div class="mb-2">
+            <label class="form-label">Rejection reason (optional)</label>
+            <textarea name="reason" class="form-control" rows="3"><%= user.verificationRejectReason || '' %></textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <form method="POST" action="/admin/users/<%= user._id %>/approve">
+              <button type="submit" class="btn btn-success">Approve</button>
+            </form>
+            <button type="submit" class="btn btn-danger">Reject</button>
+            <a class="btn btn-secondary" href="/admin/users">Back</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

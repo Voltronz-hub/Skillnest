@@ -55,7 +55,7 @@
                 Delete
               </button>
               <% if (user.role !== 'admin') { %>
-                <button class="btn btn-sm btn-primary make-admin ms-1" data-user-id="<%= user._id %>">Make admin</button>
+                <a class="btn btn-sm btn-success ms-1" href="/admin/users/<%= user._id %>/review">Review</a>
               <% } %>
             </td>
           </tr>

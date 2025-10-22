@@ -162,6 +162,46 @@ router.post('/users/:id/delete', requireAdmin, async (req, res) => {
   }
 });
 
+// Show review page for a user
+router.get('/users/:id/review', requireAdmin, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findById(id).lean();
+    if (!user) return res.status(404).render('error', { message: 'Not found', error: 'User not found', status: 404 });
+    res.render('admin/review-user', { user });
+  } catch (err) {
+    console.error('Review user error:', err);
+    res.status(500).render('error', { message: 'Review Error', error: 'Failed to load user', status: 500 });
+  }
+});
+
+// Approve user (mark verificationStatus = approved and verified true)
+router.post('/users/:id/approve', requireAdmin, async (req, res) => {
+  try {
+    const id = req.params.id;
+    await User.findByIdAndUpdate(id, { verificationStatus: 'approved', verified: true });
+    req.session.adminFlash = `User ${id} approved.`;
+    res.redirect('/admin/users');
+  } catch (err) {
+    console.error('Approve user error:', err);
+    res.status(500).render('error', { message: 'Approve Error', error: 'Failed to approve user', status: 500 });
+  }
+});
+
+// Reject user (mark verificationStatus = rejected and verified false)
+router.post('/users/:id/reject', requireAdmin, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const reason = req.body && (req.body.reason || req.body && req.body.reason) ? (req.body.reason || '') : '';
+    await User.findByIdAndUpdate(id, { verificationStatus: 'rejected', verified: false, verificationRejectReason: reason });
+    req.session.adminFlash = `User ${id} rejected.` + (reason ? ` Reason: ${reason}` : '');
+    res.redirect('/admin/users');
+  } catch (err) {
+    console.error('Reject user error:', err);
+    res.status(500).render('error', { message: 'Reject Error', error: 'Failed to reject user', status: 500 });
+  }
+});
+
 // Suspend/Unsuspend user
 router.post('/users/:id/suspend', requireAdmin, async (req, res) => {
   try {
@@ -176,4 +216,57 @@ router.post('/users/:id/suspend', requireAdmin, async (req, res) => {
 });
 
 module.exports = router;
+
+// --- Admin job management API endpoints ---
+// Note: keep these after module.exports for simplicity in this exercise,
+// but in production you'd organize them before exporting.
+router.get('/jobs', requireAdmin, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page || '1', 10);
+    const perPage = 20;
+    const total = await Job.countDocuments();
+    const totalPages = Math.ceil(total / perPage);
+    const jobs = await Job.find().populate('client', 'username').sort({ createdAt: -1 }).skip((page - 1) * perPage).limit(perPage).lean();
+    res.render('admin/jobs', { jobs, totalPages, currentPage: page, hasPrev: page > 1, hasNext: page < totalPages });
+  } catch (err) {
+    console.error('Admin jobs list error:', err);
+    res.status(500).render('error', { message: 'Jobs Error', error: 'Failed to load jobs', status: 500 });
+  }
+});
+
+router.post('/jobs/:id/status', requireAdmin, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const status = req.body && req.body.status ? req.body.status : null;
+    if (!status) return res.json({ success: false, message: 'Missing status' });
+    await Job.findByIdAndUpdate(id, { status });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Update job status error:', err);
+    res.json({ success: false, message: 'Update failed' });
+  }
+});
+
+router.post('/jobs/:id/approve', requireAdmin, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const approved = req.body && (req.body.approved === 'true' || req.body.approved === true || req.body.approved === '1');
+    await Job.findByIdAndUpdate(id, { approved });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Approve job error:', err);
+    res.json({ success: false, message: 'Approve failed' });
+  }
+});
+
+router.post('/jobs/:id/delete', requireAdmin, async (req, res) => {
+  try {
+    const id = req.params.id;
+    await Job.findByIdAndDelete(id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete job error:', err);
+    res.json({ success: false, message: 'Delete failed' });
+  }
+});
 

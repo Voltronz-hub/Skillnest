@@ -22,7 +22,8 @@
             <form method="POST" action="/profile/edit" enctype="multipart/form-data">
               <div class="mb-3 text-center">
                 <% if (profile && profile.profileImage) { %>
-                  <img src="/uploads/<%= profile.profileImage %>" alt="Profile Image" class="rounded-circle mb-2" style="width:100px;height:100px;object-fit:cover;">
+                  <% const profileImgSrc = (profile.profileImage && profile.profileImage.toString().startsWith('http')) ? profile.profileImage : ('/uploads/' + profile.profileImage); %>
+                  <img src="<%= profileImgSrc %>" alt="Profile Image" class="rounded-circle mb-2" style="width:100px;height:100px;object-fit:cover;">
                 <% } %>
               </div>
               <div class="mb-3">
@@ -82,7 +83,8 @@
                   <label class="form-label">Uploaded Documents</label>
                   <ul class="list-group">
                     <% verificationDocs.forEach(function(doc) { %>
-                      <li class="list-group-item"><a href="/uploads/<%= doc %>" target="_blank"><%= doc %></a></li>
+                      <% const docHref = (doc && doc.toString().startsWith('http')) ? doc : ('/uploads/' + doc); %>
+                      <li class="list-group-item"><a href="<%= docHref %>" target="_blank"><%= doc %></a></li>
                     <% }) %>
                   </ul>
                 </div>
@@ -97,7 +99,8 @@
                   <label class="form-label">Portfolio</label>
                   <div class="d-flex flex-wrap gap-2">
                     <% profile.portfolio.forEach(function(p) { %>
-                      <a href="/uploads/<%= p %>" target="_blank"><img src="/uploads/<%= p %>" style="width:80px;height:80px;object-fit:cover;border-radius:.4rem"/></a>
+                      <% const pHref = (p && p.toString().startsWith('http')) ? p : ('/uploads/' + p); %>
+                      <a href="<%= pHref %>" target="_blank"><img src="<%= pHref %>" style="width:80px;height:80px;object-fit:cover;border-radius:.4rem"/></a>
                     <% }) %>
                   </div>
                 </div>

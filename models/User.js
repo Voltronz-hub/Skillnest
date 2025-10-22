@@ -16,6 +16,7 @@ const userSchema = new mongoose.Schema({
   verified: { type: Boolean, default: false },
   verificationStatus: { type: String, enum: ['none','pending','approved','rejected'], default: 'none' },
   verificationDocs: [String],
+  verificationRejectReason: { type: String },
   // Portfolio files (filenames stored in uploads/)
   portfolio: [String],
   // Cached rating info
